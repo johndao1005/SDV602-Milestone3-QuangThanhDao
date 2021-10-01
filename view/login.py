@@ -65,7 +65,7 @@ class Login(tk.Tk):
         self.signup = tk.Toplevel()
         self.signup.title(setup.app_name)
         self.signup.iconbitmap(setup.icon)
-        options = {'padx': 10, 'pady': 5}
+        options = setup.pad10
         label = ttk.Label(self.signup, text="Sign up").grid(
             column=0, row=0, **options, columnspan=2)
         self.signup.geometry("310x360+100+100")
@@ -80,29 +80,28 @@ class Login(tk.Tk):
         lf.grid(column=0, row=1, padx=20, pady=20)
         label = ttk.Label(lf, text="Username").grid(
             column=0, row=3, **options)
-        username_entry = ttk.Entry(lf, textvariable=username).grid(
+        username_entry = ttk.Entry(lf, textvariable=username)
+        username_entry.grid(
             column=1, row=3, **options)
-        username_check = ttk.Label(lf, text="").grid(column=1, row=4)
-        label = ttk.Label(lf, text="Pass word").grid(
+        label = ttk.Label(lf, text="Password").grid(
             column=0, row=5, **options)
-        password_entry = ttk.Entry(lf, textvariable=password).grid(
+        password_entry = ttk.Entry(lf, textvariable=password)
+        password_entry.grid(
             column=1, row=5, **options)
-        password_check = ttk.Label(lf, text="").grid(column=1, row=6)
         label = ttk.Label(lf, text="Confirm Password").grid(
             column=0, row=7, **options)
         confirmpassword_entry = ttk.Entry(
-            lf, textvariable=confirmPassword).grid(column=1, row=7, **options)
-        confirm_password_check = ttk.Label(
-            lf, text="").grid(column=1, row=8)
+            lf, textvariable=confirmPassword)
+        confirmpassword_entry.grid(column=1, row=7, **options)
         label = ttk.Label(lf, text="Email").grid(
             column=0, row=9, **options)
-        email_entry = ttk.Entry(lf, textvariable=email).grid(
+        email_entry = ttk.Entry(lf, textvariable=email)
+        email_entry.grid(
             column=1, row=9, **options)
-        email_check = ttk.Label(lf, text="").grid(column=1, row=10)
         button = ttk.Button(lf,
                             text="Sign Up",
-                            command=lambda: makeUser(
-                                username, password, confirmPassword, email)
+                            command=lambda: makeUser(self.signup,
+                                username_entry.get(), password_entry.get(), confirmpassword_entry.get(), email_entry.get())
                             ).grid(column=0, row=11, **options, columnspan=2)
         button = ttk.Button(self.signup,
                             text="Cancel",

@@ -5,7 +5,7 @@ With the application user can view data in graph with matplotlib while enjoy the
 """
 
 from view.login import Login 
-
+from dotenv import dotenv_values
 def start():
     app = Login()
     app.mainloop()

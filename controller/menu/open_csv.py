@@ -17,7 +17,9 @@ def selectFile(action,target):
             title='Select csv datasource',
             initialdir='./data-sample',
             filetypes=filetypes)
+    
     if action =="merge":
         target.insert(END,filename)
+        
     if action =="open":
         target.loadDES(filename)
