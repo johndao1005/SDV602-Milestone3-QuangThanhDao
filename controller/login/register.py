@@ -15,7 +15,7 @@ def makeUser(window,name,pw,pw2,email):
         """
         error = ""
         try :
-            client = connectDB()
+            db = connectDB()
             if len(pw)< 8:
                 error += "\nThe password needs to be at least 8 characters"
             if pw2 != pw:
@@ -27,7 +27,7 @@ def makeUser(window,name,pw,pw2,email):
             if error != "":
                 showerror("Incorrect input(s)",f"Please correct the following errors:{error}")
             else:
-                client["users"].insert_one(
+                db["users"].insert_one(
                     {"user":name,
                     "password":pw,
                     "email":email

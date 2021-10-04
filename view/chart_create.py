@@ -92,6 +92,7 @@ def draw_graph(window, frame,dataview):
         ax.grid(b=True, alpha=0.5)
         ax.set_xlabel('Longtitude')
         ax.set_ylabel('Latitude')
+        
     # ANCHOR draw graph
     canvas = FigureCanvasTkAgg(fig, master=window)  # A tk.DrawingArea.
     canvas.draw()
