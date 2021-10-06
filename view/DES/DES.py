@@ -6,14 +6,19 @@ from view.chart_create import draw_graph
 import tkinter as tk
 from tkinter import ttk
 import view.setup as setup
-from controller.menu.logout import logout
 
 class DES(tk.Frame):
+    """
+    Create a template for all the DES to follow which contain the buttons graphs and other setting to allow all the DES to be uniformed.
+    The DES template is tkinter Frame will be displayed on parent
+    """
     def __init__(self, parent, controller):
+        """start the DES which have empty details such as next, prev DES as well as the data type
+        """
         self.frametype = None
         self.nextDES = None
         self.prevDES = None
-        tk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent,)
 
     def DES_setup(self,window, dataview):
         """General setup for DES to be displayed 
@@ -63,17 +68,16 @@ class DES(tk.Frame):
                             text="Upload",
                             command=lambda: dataview.openUpload()
                             ).grid(column=0, row=5, **setup.pad20)
-        Location_self = ttk.Button(window,
-                                text="Sign out",
-                                command=lambda: logout(dataview)
-                                ).grid(column=2, row=4, **setup.pad20)
-        button = ttk.Button(window,
-                            text="Quit",
-                            command=lambda: dataview.destroy()).grid(column=3, row=4, **setup.pad20)
-        
 # inherit from DES
 class genderDES(DES):
+    """Generate gender DES which is a child of DES template
+
+    Args:
+        DES (object): DES template
+    """
     def __init__(self,window, dataview):
+        """initial the genderDES which take next DES as location DES and prev DES as feature DES while the data type is gender
+        """
         DES.__init__(self, window, dataview)
         self.nextDES = locationDES
         self.prevDES = featureDES
@@ -82,7 +86,14 @@ class genderDES(DES):
 
 
 class locationDES(DES):
+    """Generate location DES which is a child of DES template
+
+    Args:
+        DES (object): DES template
+    """
     def __init__(self, window, dataview):
+        """initial the genderDES which take next DES as location DES and prev DES as feature DES while the data type is gender
+        """
         DES.__init__(self, window, dataview)
         self.nextDES = featureDES
         self.prevDES = genderDES
@@ -91,7 +102,14 @@ class locationDES(DES):
 
 
 class featureDES(DES):
+    """Generate feature DES which is a child of DES template
+
+    Args:
+        DES (object): DES template
+    """
     def __init__(self,window, dataview):
+        """initial the featureDES which take next DES as gender DES and prev DES as location  DES while the data type is feature
+        """
         DES.__init__(self, window, dataview)
         self.nextDES = genderDES
         self.prevDES = locationDES

@@ -12,12 +12,14 @@ def authentication(parent, email, pw):
             pw (string): password from user input
         """
     # connect to MongoDB, change the << MONGODB URL >> to reflect your own connection string
-    db = connectDB()
-    currentUser = db["users"].find_one({"email":email})
-    print(currentUser)
-    if (currentUser.password == pw):
-        showinfo("Welcome User", "Login successfully, Happy browsing!!")
-        parent.destroy()
-        dataView().mainloop()
+    if email.strip() =="" or pw.strip() =="":
+        showerror("Empty input","Please type your email and password to login")
     else:
-        showerror("Incorrect email/password","Please check your email and password and try again")
+        db = connectDB()
+        currentUser = db["users"].find_one({"email":email.strip()})
+        if (currentUser["password"] == pw.strip()):
+            showinfo("Welcome User", "Login successfully, Happy browsing!!")
+            parent.destroy()
+            dataView(email).mainloop()  
+        else:
+            showerror("Incorrect email/password","Please check your email and password and try again")

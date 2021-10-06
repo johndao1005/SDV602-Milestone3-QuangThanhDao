@@ -15,6 +15,12 @@ def makeUser(window,name,pw,pw2,email):
         """
         error = ""
         try :
+            #process data  and remove the white space
+            pw = pw.strip()
+            pw2 = pw2.strip()
+            name = name.strip()
+            email = email.strip()
+            #validate the information
             db = connectDB()
             if len(pw)< 8:
                 error += "\nThe password needs to be at least 8 characters"
@@ -22,11 +28,12 @@ def makeUser(window,name,pw,pw2,email):
                 error += "\nThe confirm password must be the same as pasword"
             if not re.fullmatch(regex, email):
                 error += "\nEnter a valid email address"
-            # if client["users"].find({"email":email}) != None:
-            #     error += "\nThe Email is already in use"
+            elif db["users"].find({"email":email}).count() != 0:
+                error += "\nThe Email is already in use"
             if error != "":
                 showerror("Incorrect input(s)",f"Please correct the following errors:{error}")
             else:
+            #Create new user
                 db["users"].insert_one(
                     {"user":name,
                     "password":pw,

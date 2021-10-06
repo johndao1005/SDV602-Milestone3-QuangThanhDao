@@ -26,10 +26,10 @@ class Login(tk.Tk):
         ).grid(column=0, row=0, padx=10, pady=0)
         password = tk.StringVar()
         username = tk.StringVar()
-        label = ttk.Label(lf, text="Username").grid(
+        label = ttk.Label(lf, text="Email").grid(
             column=0, row=1, **options, ipadx=5, ipady=5)
-        username_entry = ttk.Entry(lf, textvariable=username)
-        username_entry.grid(
+        email_entry = ttk.Entry(lf, textvariable=username)
+        email_entry.grid(
             column=1, row=1, **options, columnspan=2)
         label = ttk.Label(lf, text="Password").grid(
             column=0, row=2, **options, ipadx=5, ipady=5)
@@ -43,7 +43,7 @@ class Login(tk.Tk):
         login_btn = ttk.Button(button_frame,
                                text="Login",
                                command=lambda: authentication(
-                                    self, username, password)
+                                    self, email_entry.get(), password_entry.get())
                                ).grid(column=1, row=3, **option2)
         signup_btn = ttk.Button(button_frame,
                                 text="Sign Up",
@@ -78,26 +78,28 @@ class Login(tk.Tk):
 
         lf = ttk.LabelFrame(self.signup, text="Login details")
         lf.grid(column=0, row=1, padx=20, pady=20)
-        label = ttk.Label(lf, text="Username").grid(
-            column=0, row=3, **options)
-        username_entry = ttk.Entry(lf, textvariable=username)
-        username_entry.grid(
-            column=1, row=3, **options)
-        label = ttk.Label(lf, text="Password").grid(
-            column=0, row=5, **options)
-        password_entry = ttk.Entry(lf, textvariable=password)
-        password_entry.grid(
-            column=1, row=5, **options)
-        label = ttk.Label(lf, text="Confirm Password").grid(
-            column=0, row=7, **options)
-        confirmpassword_entry = ttk.Entry(
-            lf, textvariable=confirmPassword)
-        confirmpassword_entry.grid(column=1, row=7, **options)
         label = ttk.Label(lf, text="Email").grid(
-            column=0, row=9, **options)
+            column=0, row=3, **options)
         email_entry = ttk.Entry(lf, textvariable=email)
         email_entry.grid(
-            column=1, row=9, **options)
+            column=1, row=3, **options)
+        
+        label = ttk.Label(lf, text=" FirstName").grid(
+            column=0, row=5, **options)
+        username_entry = ttk.Entry(lf, textvariable=username)
+        username_entry.grid(
+            column=1, row=5, **options)
+        label = ttk.Label(lf, text="Password").grid(
+            column=0, row=7, **options)
+        password_entry = ttk.Entry(lf, textvariable=password, show="*")
+        password_entry.grid(
+            column=1, row=7, **options)
+        label = ttk.Label(lf, text="Confirm Password").grid(
+            column=0, row=9, **options)
+        confirmpassword_entry = ttk.Entry(
+            lf, textvariable=confirmPassword, show="*")
+        confirmpassword_entry.grid(column=1, row=9, **options)
+        
         button = ttk.Button(lf,
                             text="Sign Up",
                             command=lambda: makeUser(self.signup,

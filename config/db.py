@@ -13,7 +13,6 @@ MONGO_URI = os.getenv("MONGO_URI")
 def connectDB():
     try:
         client = MongoClient(f"{MONGO_URI}",tlsCAFile=ca)
-        print(MONGO_URI)
         print("Connect to Database")
         return client["white-shark"]
     except:
