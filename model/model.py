@@ -4,7 +4,7 @@ After that filter the data in different catogeries with different methods such a
 """
 from tkinter.constants import S
 from model.data.data_scan import DataManager
-
+from config.db import connectDB
 class Model():
     def __init__(self, dataSource=None):
         self.dataSource = dataSource

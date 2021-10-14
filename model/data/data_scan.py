@@ -5,7 +5,7 @@ import csv
 from os import path
 import pandas as pd
 from typing import Dict
-
+from config.db import connectDB
 
 class DataManager():
     def __init__(self):
