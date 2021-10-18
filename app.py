@@ -14,4 +14,6 @@ if __name__ == '__main__':
     Initiate the app
     """
     from view.dataView import dataView
-    start()
+    # start()
+    app = dataView()
+    app.mainloop()

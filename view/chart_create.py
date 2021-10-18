@@ -103,8 +103,8 @@ def draw_graph(window, frame,dataview):
     # pack_toolbar=False will make it easier to use a layout manager later on.
     toolbar = NavigationToolbar2Tk(canvas, window, pack_toolbar=False)
     toolbar.update()
-    canvas.get_tk_widget().grid(column=0, row=1, rowspan=4)  # create canvas
-    toolbar.grid(column=0, row=6)  # create tool bar
+    canvas.get_tk_widget().grid(column=0, row=1,columnspan=3)  # create canvas
+    toolbar.grid(column=0, row=2)  # create tool bar
 
 
 if __name__ == "__main__":

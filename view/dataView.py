@@ -15,23 +15,25 @@ class dataView(tk.Tk):
     """Data Explore Screen
     This is the main window which will display all the data regarding the datasource as long as the data is suitable.
     """
-    def __init__(self,email, *args, **kwargs):
+    def __init__(self,name=None, *args, **kwargs):
         """
         start the instance of dataView main window when it is called 
         """
         tk.Tk.__init__(self, *args, **kwargs)
-        self.user = email
+        self.user = name
         self.resizable(0,0)
-        self.geometry("940x800+0+0")
+        # self.geometry("940x800+0+0")
         self.title(setup.app_name)
         self.iconbitmap(setup.icon)
         self.check = False
         self.protocol("WM_DELETE_WINDOW", self.quit)
-        # ANCHOR frame setup
+        # ANCHOR frame setup left side
         self.container = ttk.Frame()
-        self.container.grid(column=0, row=0,columnspan=4)
+        self.container.grid(column=0, row=0,sticky="NW")
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
+        self.frames = {}
+        self.loadDES()
         # ANCHOR menubar setup
         menubar = tk.Menu(self.container)
         filemenu = tk.Menu(menubar, tearoff=0)
@@ -54,16 +56,51 @@ class dataView(tk.Tk):
         menubar.add_cascade(label="File", menu=filemenu)
         menubar.add_cascade(label="Data view", menu=DESmenu)
         tk.Tk.config(self, menu=menubar)
-        self.frames = {}
-        self.loadDES()
-        button_frame = tk.Frame().grid(column=2, row=2,sticky="NE")
-        button = ttk.Button(button_frame,
-                            text="Quit",
-                            command=lambda: self.quit() ).grid(column=3, row=1,)
-        Location_self = ttk.Button(button_frame,
+        
+        # ANCHOR chat box right side
+        input = tk.StringVar()
+        chatList = tk.StringVar()
+        userList = tk.StringVar()
+        # chat box creating and function
+        rightSide = ttk.Frame()
+        rightSide.grid(column=1, row=0, **setup.pad20, columnspan=2,sticky="N")
+        label = ttk.Label(rightSide, text=f"Current user {self.user}",font=setup.normal).grid(
+            column=0, row=0)
+        Location_self = ttk.Button(rightSide,
                                 text="Sign out",
                                 command=lambda: logout(self)
-                                ).grid(column=2, row=1)
+                                ).grid(column=1, row=0)
+        
+        frame1 = ttk.LabelFrame(rightSide, text="Chat box", borderwidth=0)
+        frame1.grid(column=0, row=1, **setup.pad20, columnspan=2)
+        userLog = tk.Label(frame1,
+                            background='light gray',
+                            textvariable=userList, width=40, height=5
+                            ).grid(column=0, row=0, **setup.pad20,columnspan=2)
+        chatLog = tk.Label(frame1,
+                            background='light gray',
+                            textvariable=chatList, width=40, height=20
+                            ).grid(column=0, row=1, **setup.pad20,columnspan=2)
+        entry = ttk.Entry(frame1, textvariable=input).grid(
+            column=1, row=2, **setup.pad20, sticky="E")
+        button = ttk.Button(frame1,
+                            text="Send",
+                            command=lambda: self.show_frame(next)
+                            ).grid(column=0, row=2, **setup.pad20, sticky="E")
+        # ANCHOR Data control frame
+        frame2 = ttk.LabelFrame(rightSide, text="Data Control", borderwidth=0)
+        frame2.grid(column=0, row=2, **setup.pad20, columnspan=2,sticky="NEW")
+        button = ttk.Button(frame2,
+                            text="Update",
+                            command=lambda: self.loadDES()
+                            ).grid(column=0, row=1, **setup.pad20)
+        button = ttk.Button(frame2,
+                            text="Upload",
+                            command=lambda: self.openUpload()
+                            ).grid(column=1, row=1, **setup.pad20)
+        button = ttk.Button(self,
+                            text="Quit",
+                            command=lambda: self.quit() ).grid(column=2, row=1,sticky="E",**setup.pad20)
         
     # ANCHOR load all DES
     def loadDES(self, source=setup.datasource):

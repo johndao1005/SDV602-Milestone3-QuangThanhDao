@@ -14,7 +14,6 @@ class DataManager():
         self.file = None
 
     def readFile(self, filePath):
-        
         with open(filePath, 'r', newline="") as data:
             dataset = csv.DictReader(data)
             output = []

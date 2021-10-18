@@ -34,40 +34,15 @@ class DES(tk.Frame):
             column=0, row=0, **setup.pad20, columnspan=3)
         # graph
         draw_graph(window, frame,dataview)
-        input = tk.StringVar()
-        chatLog = tk.StringVar()
-        # chat box creating and function
-        frame1 = ttk.LabelFrame(window, text="Chat box", borderwidth=0)
-        frame1.grid(column=2, row=1, **setup.pad20, sticky="E",columnspan=2)
-        chatBox = ttk.Label(frame1,
-                            background='light gray',
-                            textvariable=chatLog, width=40
-                            ).grid(column=1, row=1, **setup.pad20, columnspan=2)
-        entry = ttk.Entry(frame1, textvariable=input).grid(
-            column=1, row=2, **setup.pad20, sticky="E")
-        button = ttk.Button(frame1,
-                            text="Send",
-                            command=lambda: dataview.show_frame(next)
-                            ).grid(column=2, row=2, **setup.pad20, sticky="E")
-        # ANCHOR Buttons for self
-        frame2 = ttk.LabelFrame(window, text="Control box", borderwidth=0)
-        frame2.grid(column=2, row=3, **setup.pad20, sticky="NSEW",columnspan=2)
-        button = ttk.Button(frame2,
+        button = ttk.Button(self,
                             text="Next",
                             command=lambda: dataview.show_frame(next)
-                            ).grid(column=0, row=4, **setup.pad20)
-        button = ttk.Button(frame2,
+                            ).grid(column=1, row=2, **setup.pad20)
+        button = ttk.Button(self,
                             text="Previous",
                             command=lambda: dataview.show_frame(prev)
-                            ).grid(column=1, row=4, **setup.pad20)
-        button = ttk.Button(frame2,
-                            text="Update",
-                            command=lambda: dataview.loadDES()
-                            ).grid(column=1, row=5, **setup.pad20)
-        button = ttk.Button(frame2,
-                            text="Upload",
-                            command=lambda: dataview.openUpload()
-                            ).grid(column=0, row=5, **setup.pad20)
+                            ).grid(column=2, row=2, **setup.pad20)
+        
 # inherit from DES
 class genderDES(DES):
     """Generate gender DES which is a child of DES template
