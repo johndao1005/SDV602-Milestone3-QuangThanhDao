@@ -1,5 +1,6 @@
 from tkinter.messagebox import showinfo, showerror
 from config.db import connectDB
+import bcrypt
 
 
 def authentication(parent, email, pw):
@@ -15,11 +16,13 @@ def authentication(parent, email, pw):
     if email.strip() =="" or pw.strip() =="":
         showerror("Empty input","Please type your email and password to login")
     else:
+        bytePassword = str.encode(pw)
         db = connectDB()
         currentUser = db["users"].find_one({"email":email.strip()})
-        if (currentUser["password"] == pw.strip()):
+        hashed = bcrypt.hashpw(bytePassword, bcrypt.gensalt())
+        if bcrypt.checkpw(bytePassword, hashed):
             showinfo("Welcome User", "Login successfully, Happy browsing!!")
             parent.destroy()
-            dataView(email).mainloop()  
+            dataView(email).mainloop()
         else:
             showerror("Incorrect email/password","Please check your email and password and try again")

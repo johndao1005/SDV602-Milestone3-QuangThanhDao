@@ -14,6 +14,18 @@ Present the information and allow users interact
 
 Control the view and process information
 
+### Dependency
+
+To ensure the application is working, those modules is required to be install with the machine or with an virtual enviroment:
+
+- certifi
+- geopandas
+- pymongo
+- tkinter
+- matplotlib
+- numpy
+- bcrypt
+
 ## Install geopandas
 
 In order to run the application, geopandas is required as a dependency to display tagging location for on New Zealand map with longitude and latitude. 

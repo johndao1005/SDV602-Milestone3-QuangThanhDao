@@ -1,6 +1,7 @@
 from tkinter.messagebox import showinfo, showerror
 from config.db import connectDB
 import re
+import bcrypt
 
 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
@@ -30,13 +31,16 @@ def makeUser(window,name,pw,pw2,email):
                 error += "\nEnter a valid email address"
             elif db["users"].find({"email":email}).count() != 0:
                 error += "\nThe Email is already in use"
+                
+            #check if there is no error then create users
             if error != "":
                 showerror("Incorrect input(s)",f"Please correct the following errors:{error}")
             else:
             #Create new user
+                hashed = bcrypt.hashpw(str.encode(pw), bcrypt.gensalt())
                 db["users"].insert_one(
                     {"user":name,
-                    "password":pw,
+                    "password": hashed,
                     "email":email
                     })
                 showinfo("Registered success","User is registered successfully")
