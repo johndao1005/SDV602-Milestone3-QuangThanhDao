@@ -39,7 +39,7 @@ def makeUser(window,name,pw,pw2,email):
             #Create new user
                 hashed = bcrypt.hashpw(str.encode(pw), bcrypt.gensalt())
                 db["users"].insert_one(
-                    {"user":name,
+                    {"name":name,
                     "password": hashed,
                     "email":email
                     })

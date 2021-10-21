@@ -9,7 +9,7 @@ from controller.menu.logout import logout
 from controller.menu.merge_csv import mergeFiles
 from controller.menu.open_csv import selectFile
 from view.DES.DES import genderDES, locationDES, featureDES
-from model.chat import updateChat
+from model.chat import ChatSession
 
 class dataView(tk.Tk):
     """Data Explore Screen
@@ -59,8 +59,8 @@ class dataView(tk.Tk):
         
         # ANCHOR chat box right side
         input = tk.StringVar()
-        chatList = tk.StringVar()
-        userList = tk.StringVar()
+        self.chatList = tk.StringVar()
+        self.userList = tk.StringVar()
         # chat box creating and function
         rightSide = ttk.Frame()
         rightSide.grid(column=1, row=0, **setup.pad20, columnspan=2,sticky="N")
@@ -75,11 +75,11 @@ class dataView(tk.Tk):
         frame1.grid(column=0, row=1, **setup.pad20, columnspan=2)
         userLog = tk.Label(frame1,
                             background='white',
-                            textvariable=userList, width=40, height=5
+                            textvariable=self.userList, width=40, height=5
                             ).grid(column=0, row=0, **setup.pad20,columnspan=2)
         chatLog = tk.Label(frame1,
                             background='white',
-                            textvariable=chatList, width=40, height=20
+                            textvariable=self.chatList, width=40, height=20
                             ).grid(column=0, row=1, **setup.pad20,columnspan=2)
         entry = ttk.Entry(frame1, textvariable=input).grid(
             column=1, row=2, **setup.pad20, sticky="E")
@@ -101,8 +101,10 @@ class dataView(tk.Tk):
         button = ttk.Button(self,
                             text="Quit",
                             command=lambda: self.quit() ).grid(column=2, row=1,sticky="E",**setup.pad20)
-        updateChat(userList,chatList)
+        self.updateChat()
         
+    def updateChat(self):
+        getChat(self.user,self.userList,self.chatList)
     # ANCHOR load all DES
     def loadDES(self, source=setup.datasource):
         """
