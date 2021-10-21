@@ -3,8 +3,8 @@ from config.db import connectDB
 import re
 import bcrypt
 
-
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
 def makeUser(window,name,pw,pw2,email):
         """Checking input is valid and not already exist in the current database before creating new user instance
 

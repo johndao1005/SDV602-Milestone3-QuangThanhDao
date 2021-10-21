@@ -9,7 +9,7 @@ from controller.menu.logout import logout
 from controller.menu.merge_csv import mergeFiles
 from controller.menu.open_csv import selectFile
 from view.DES.DES import genderDES, locationDES, featureDES
-
+from model.chat import updateChat
 
 class dataView(tk.Tk):
     """Data Explore Screen
@@ -74,11 +74,11 @@ class dataView(tk.Tk):
         frame1 = ttk.LabelFrame(rightSide, text="Chat box", borderwidth=0)
         frame1.grid(column=0, row=1, **setup.pad20, columnspan=2)
         userLog = tk.Label(frame1,
-                            background='light gray',
+                            background='white',
                             textvariable=userList, width=40, height=5
                             ).grid(column=0, row=0, **setup.pad20,columnspan=2)
         chatLog = tk.Label(frame1,
-                            background='light gray',
+                            background='white',
                             textvariable=chatList, width=40, height=20
                             ).grid(column=0, row=1, **setup.pad20,columnspan=2)
         entry = ttk.Entry(frame1, textvariable=input).grid(
@@ -101,6 +101,7 @@ class dataView(tk.Tk):
         button = ttk.Button(self,
                             text="Quit",
                             command=lambda: self.quit() ).grid(column=2, row=1,sticky="E",**setup.pad20)
+        updateChat(userList,chatList)
         
     # ANCHOR load all DES
     def loadDES(self, source=setup.datasource):
@@ -167,7 +168,7 @@ class dataView(tk.Tk):
                               ).grid(column=2, row=4, **setup.pad10)
 
     def openUpload(self):
-        """check if an instead of upload event is exist, then open the upload window
+        """check if an instance of upload event is exist, then open the upload window
         """
         if self.check == False:
             self.uploadWindow()
