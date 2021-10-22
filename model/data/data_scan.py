@@ -29,6 +29,7 @@ class DataManager():
             for row in self.readFile(newFile):
                 writer.writerow(row)
 
+    
     def readLocation(self, filePath):
         locationData = pd.read_csv(filePath,
                                 usecols=["decimalLatitude",

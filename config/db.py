@@ -18,6 +18,3 @@ def connectDB():
         return client["white-shark"]
     except:
         print("Connection failed")
-
-if __name__ == "__main__":
-    connectDB()

@@ -21,6 +21,6 @@ def authentication(parent, email, pw):
         if bcrypt.checkpw(bytePassword, hashed):
             showinfo(f"Welcome {currentUser['user']} ", "Login successfully, Happy browsing!!")
             parent.destroy()
-            dataView(currentUser['name']).mainloop()
+            dataView(currentUser['name'])
         else:
             showerror("Incorrect email/password","Please check your email and password and try again")

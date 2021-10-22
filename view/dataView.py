@@ -10,12 +10,12 @@ from controller.menu.merge_csv import mergeFiles
 from controller.menu.open_csv import selectFile
 from view.DES.DES import genderDES, locationDES, featureDES
 from model.chat import ChatSession
-
+import threading
 class dataView(tk.Tk):
     """Data Explore Screen
     This is the main window which will display all the data regarding the datasource as long as the data is suitable.
     """
-    def __init__(self,name=None, *args, **kwargs):
+    def __init__(self,name='User', *args, **kwargs):
         """
         start the instance of dataView main window when it is called 
         """
@@ -73,14 +73,16 @@ class dataView(tk.Tk):
         
         frame1 = ttk.LabelFrame(rightSide, text="Chat box", borderwidth=0)
         frame1.grid(column=0, row=1, **setup.pad20, columnspan=2)
-        userLog = tk.Label(frame1,
+        
+        userLog = tk.Entry(frame1,
                             background='white',
-                            textvariable=self.userList, width=40, height=5
+                            textvariable=self.userList
                             ).grid(column=0, row=0, **setup.pad20,columnspan=2)
-        chatLog = tk.Label(frame1,
+        chatLog = tk.Entry(frame1,
                             background='white',
-                            textvariable=self.chatList, width=40, height=20
+                            textvariable=self.chatList
                             ).grid(column=0, row=1, **setup.pad20,columnspan=2)
+        
         entry = ttk.Entry(frame1, textvariable=input).grid(
             column=1, row=2, **setup.pad20, sticky="E")
         button = ttk.Button(frame1,
@@ -101,10 +103,19 @@ class dataView(tk.Tk):
         button = ttk.Button(self,
                             text="Quit",
                             command=lambda: self.quit() ).grid(column=2, row=1,sticky="E",**setup.pad20)
-        self.updateChat()
+        thread1 = threading.Thread(target=self.mainloop)
+        thread2 = threading.Thread(target=self.updateChat)
+        thread1.start()
+        print('start Thread 1')
+        thread2.start()
+        print('start Thread 2')
+        thread1.join()
+        thread2.join()
         
     def updateChat(self):
-        getChat(self.user,self.userList,self.chatList)
+        self.userList.set('Haha')
+        chat = ChatSession(self.user,self.userList,self.chatList)
+        chat.update_session()
     # ANCHOR load all DES
     def loadDES(self, source=setup.datasource):
         """
