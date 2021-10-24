@@ -5,5 +5,6 @@ def logout(dataview):
         dataview (variable): data view main window
     """
     from view.login import Login
+    dataview.chat.check = False
     dataview.destroy()
     Login().mainloop()

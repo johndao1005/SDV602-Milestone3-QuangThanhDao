@@ -1,60 +1,71 @@
-from config.db import connectDB
+#from config.db import connectDB
 from datetime import datetime, date
+from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
 
-db = connectDB()
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+from pathlib import Path
+import os
+import certifi
+ca = certifi.where()
+load_dotenv()
+env_path = Path('.')/'.env'
+load_dotenv(dotenv_path=env_path)
+
+MONGO_URI = os.getenv("MONGO_URI")
+def connectDB():
+    try:
+        client = MongoClient(f"{MONGO_URI}",tlsCAFile=ca)
+        print("Connect to Database")
+        return client["white-shark"]
+    except:
+        print("Connection failed")
+
 today = date.today().strftime("%d/%m/%Y")
-now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+now = datetime.now()
 newline = "\n"
+
+
+# TODO show user is online depend on the current screen
 class ChatSession():
     def __init__(self,username,usersList,chatList):
+        self.check = True
+        self.DES = 'featureDES'
         self.user = username
         self.usersList = usersList
         self.chatList = chatList
+        db = connectDB()
         self.database = db['chat']
-        self.get_current_session()
-        self.session = self.database.find_one({'date':today},)
-    
-    def get_current_session (self):
-        if self.database.count_documents({'date':today}) == 0:
-            self.database.insert_one({
-                'date':today,
-                'user-list':[self.user],
-                'chat-list':[],
-                'last-modified':now
-            })
-        else:
-            self.database.update_one(
-                {'date':today},
-                {'$push':{'user-list': self.user}
-                ,'$set':{'last-modified':now}},
-                upsert=True)
-    
-    def update_session(self):
-        #while True:
-            self.usersList.set(newline.join([user for user in self.session['user-list'] if isinstance(user,str)]))
-            self.chatList.set(newline.join([user for user in self.session['chat-list']]))
-    
-    def send_message(self):
+        self.start_session()
         
-        pass
-
-# def addUser(username):
-#     pass
-
-# def getChat(username,userList,chatList):
-#     # ANCHOR add user into the user list first
-#     addUser = {'$push':{'user-list': username},'$set':{'last-update':now}}
-#     currentChat = db['chat']
-#     currentChat.find_one_and_update({'date':today},addUser,upsert=True)
-    
-#     # ANCHOR creating loop to update chat
-#     # while True:
-#     todayChat = currentChat.find_one({'date':today})
-#     print(todayChat == None)
-#     if todayChat['last-update'] == now:
-#             print(todayChat['user-list'])
-#             print(todayChat['chat-log'])
-#             print('update')
-#             currentChat.update_one({"last-update":now})
-#             pass
+    def switch_DES(self,DES):
+        self.database.bulk_write([
+            UpdateOne({'DES':DES},{'$addToSet':{'user-list':self.user}}),
+            UpdateOne({'DES':self.DES},{'$pull':{'user-list':self.user}})
+        ])
+        self.DES = DES
         
+    def send_message(self,message):
+        message = f'{self.user} ({now.strftime("%H:%M")}): {message}'
+        self.database.find_one_and_update({'DES':self.DES},{'date':today},{'$push':{'chat-list':message}})
+    
+    def start_session (self):
+        self.database.update_one(
+            {'DES':self.DES},
+            {'$push':{'user-list':self.user}
+            },
+            upsert=True)
+    
+    # def update_session(self):
+    #     while self.check is True:
+    #         self.session = self.database.find_one({'date':today})
+    #         self.usersList.set(newline.join([user for user in self.session['user-list'] if isinstance(user,str)]))
+    #         self.chatList.set(newline.join([user for user in self.session['chat-list']]))
+    
+    
+if __name__ == '__main__':
+    chat = ChatSession('Kim1',['he','he'],["hoho",'haha'])
+    chat.send_message('Nice')
+    # chat.switch_DES('locationDES')
+    

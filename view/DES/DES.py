@@ -6,12 +6,15 @@ from view.chart_create import draw_graph
 import tkinter as tk
 from tkinter import ttk
 import view.setup as setup
+from controller.menu.logout import logout
+
 
 class DES(tk.Frame):
     """
     Create a template for all the DES to follow which contain the buttons graphs and other setting to allow all the DES to be uniformed.
     The DES template is tkinter Frame will be displayed on parent
     """
+
     def __init__(self, parent, controller):
         """start the DES which have empty details such as next, prev DES as well as the data type
         """
@@ -20,7 +23,7 @@ class DES(tk.Frame):
         self.prevDES = None
         tk.Frame.__init__(self, parent,)
 
-    def DES_setup(self,window, dataview):
+    def DES_setup(self, window, dataview):
         """General setup for DES to be displayed 
 
         Args:
@@ -30,10 +33,10 @@ class DES(tk.Frame):
         next = self.nextDES
         prev = self.prevDES
         frame = self.frametype
-        label = ttk.Label(window, text=f"White shark {frame} data",font=setup.large).grid(
+        label = ttk.Label(window, text=f"White shark {frame} data", font=setup.large).grid(
             column=0, row=0, **setup.pad20, columnspan=3)
         # graph
-        draw_graph(window, frame,dataview)
+        draw_graph(window, frame, dataview)
         button = ttk.Button(self,
                             text="Next",
                             command=lambda: dataview.show_frame(next)
@@ -42,15 +45,73 @@ class DES(tk.Frame):
                             text="Previous",
                             command=lambda: dataview.show_frame(prev)
                             ).grid(column=2, row=2, **setup.pad20)
+
+        # ANCHOR chat section
+
+        input = tk.StringVar()
+        self.chatList = tk.StringVar()
+        self.userList = tk.StringVar()
+        # chat box creating and function
+        rightSide = ttk.Frame()
+        rightSide.grid(column=4, row=0, **setup.pad20,
+                       columnspan=2, sticky="N")
+        label = ttk.Label(rightSide, text=f"Current user {dataview.user}", font=setup.normal).grid(
+            column=0, row=0)
+        Location_self = ttk.Button(rightSide,
+                                   text="Sign out",
+                                   command=lambda: logout(self)
+                                   ).grid(column=1, row=0)
+        # TODO add scrollbar support
+        frame1 = ttk.LabelFrame(rightSide, text="Chat box", borderwidth=0)
+        frame1.grid(column=0, row=1, **setup.pad20, columnspan=2)
+        userLog = tk.Text(frame1,
+                           bg='white',
+                           font=setup.normal,
+                           height =3, width = 50,yscrollcommand=set()
+                           )
+        userLog.grid(column=0, row=0, **setup.pad20, columnspan=2)
+        chatLog = tk.Text(frame1,
+                           bg='white',
+                           font=setup.normal,
+                           height =10,
+                           width=50
+                           )
+        chatLog.grid(column=0, row=1, **setup.pad20, columnspan=2)
+        chatLog['state']= 'disabled'
+        userLog['state']= 'disabled'
         
-# inherit from DES
+        entry = ttk.Entry(frame1, textvariable=input,width=40,font = setup.normal).grid(
+            column=0, row=2, **setup.pad10, sticky="E")
+        button = ttk.Button(frame1,
+                            text="Send",
+                            command=lambda: self.show_frame(next)
+                            ).grid(column=1, row=2, **setup.pad10, sticky="E")
+        
+        # ANCHOR Data control frame
+        frame2 = ttk.LabelFrame(rightSide, text="Data Control", borderwidth=0)
+        frame2.grid(column=0, row=2, **setup.pad20, columnspan=2, sticky="NEW")
+        button = ttk.Button(frame2,
+                            text="Update",
+                            command=lambda: self.loadDES()
+                            ).grid(column=0, row=1, padx=20,sticky="E")
+        button = ttk.Button(frame2,
+                            text="Upload",
+                            command=lambda: self.openUpload()
+                            ).grid(column=1, row=1, pady=20,sticky="E")
+        button = ttk.Button(rightSide,
+                            text="Quit",
+                            command=lambda: self.quit()  # ANCHOR need change to close chat session
+                            ).grid(column=1, row=3, sticky="E", **setup.pad20)
+
+
 class genderDES(DES):
     """Generate gender DES which is a child of DES template
 
     Args:
         DES (object): DES template
     """
-    def __init__(self,window, dataview):
+
+    def __init__(self, window, dataview):
         """initial the genderDES which take next DES as location DES and prev DES as feature DES while the data type is gender
         """
         DES.__init__(self, window, dataview)
@@ -66,6 +127,7 @@ class locationDES(DES):
     Args:
         DES (object): DES template
     """
+
     def __init__(self, window, dataview):
         """initial the genderDES which take next DES as location DES and prev DES as feature DES while the data type is gender
         """
@@ -82,7 +144,8 @@ class featureDES(DES):
     Args:
         DES (object): DES template
     """
-    def __init__(self,window, dataview):
+
+    def __init__(self, window, dataview):
         """initial the featureDES which take next DES as gender DES and prev DES as location  DES while the data type is feature
         """
         DES.__init__(self, window, dataview)

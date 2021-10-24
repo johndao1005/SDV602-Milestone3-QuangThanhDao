@@ -5,12 +5,12 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showinfo
 import view.setup as setup
-from controller.menu.logout import logout
+
 from controller.menu.merge_csv import mergeFiles
 from controller.menu.open_csv import selectFile
 from view.DES.DES import genderDES, locationDES, featureDES
-from model.chat import ChatSession
 import threading
+
 class dataView(tk.Tk):
     """Data Explore Screen
     This is the main window which will display all the data regarding the datasource as long as the data is suitable.
@@ -56,66 +56,21 @@ class dataView(tk.Tk):
         menubar.add_cascade(label="File", menu=filemenu)
         menubar.add_cascade(label="Data view", menu=DESmenu)
         tk.Tk.config(self, menu=menubar)
+        self.mainloop()
+        # thread1 = threading.Thread(target=self.mainloop)
+        # thread2 = threading.Thread(target=self.updateChat)
+        # thread1.start()
+        # print('start Thread 1')
+        # thread2.start()
+        # print('start Thread 2')
+        # thread1.join()
+        # thread2.join()
         
-        # ANCHOR chat box right side
-        input = tk.StringVar()
-        self.chatList = tk.StringVar()
-        self.userList = tk.StringVar()
-        # chat box creating and function
-        rightSide = ttk.Frame()
-        rightSide.grid(column=1, row=0, **setup.pad20, columnspan=2,sticky="N")
-        label = ttk.Label(rightSide, text=f"Current user {self.user}",font=setup.normal).grid(
-            column=0, row=0)
-        Location_self = ttk.Button(rightSide,
-                                text="Sign out",
-                                command=lambda: logout(self)
-                                ).grid(column=1, row=0)
+    # def updateChat(self):
+    #     self.userList.set('Haha')
+    #     chat = ChatSession(self.user,self.userList,self.chatList)
+    #     chat.update_session()
         
-        frame1 = ttk.LabelFrame(rightSide, text="Chat box", borderwidth=0)
-        frame1.grid(column=0, row=1, **setup.pad20, columnspan=2)
-        
-        userLog = tk.Entry(frame1,
-                            background='white',
-                            textvariable=self.userList
-                            ).grid(column=0, row=0, **setup.pad20,columnspan=2)
-        chatLog = tk.Entry(frame1,
-                            background='white',
-                            textvariable=self.chatList
-                            ).grid(column=0, row=1, **setup.pad20,columnspan=2)
-        
-        entry = ttk.Entry(frame1, textvariable=input).grid(
-            column=1, row=2, **setup.pad20, sticky="E")
-        button = ttk.Button(frame1,
-                            text="Send",
-                            command=lambda: self.show_frame(next)
-                            ).grid(column=0, row=2, **setup.pad20, sticky="E")
-        # ANCHOR Data control frame
-        frame2 = ttk.LabelFrame(rightSide, text="Data Control", borderwidth=0)
-        frame2.grid(column=0, row=2, **setup.pad20, columnspan=2,sticky="NEW")
-        button = ttk.Button(frame2,
-                            text="Update",
-                            command=lambda: self.loadDES()
-                            ).grid(column=0, row=1, **setup.pad20)
-        button = ttk.Button(frame2,
-                            text="Upload",
-                            command=lambda: self.openUpload()
-                            ).grid(column=1, row=1, **setup.pad20)
-        button = ttk.Button(self,
-                            text="Quit",
-                            command=lambda: self.quit() ).grid(column=2, row=1,sticky="E",**setup.pad20)
-        thread1 = threading.Thread(target=self.mainloop)
-        thread2 = threading.Thread(target=self.updateChat)
-        thread1.start()
-        print('start Thread 1')
-        thread2.start()
-        print('start Thread 2')
-        thread1.join()
-        thread2.join()
-        
-    def updateChat(self):
-        self.userList.set('Haha')
-        chat = ChatSession(self.user,self.userList,self.chatList)
-        chat.update_session()
     # ANCHOR load all DES
     def loadDES(self, source=setup.datasource):
         """
@@ -134,8 +89,10 @@ class dataView(tk.Tk):
         Args:
             newFrame (object): the screen to be presented 
         """
+        #self.chat.switch_DES(f'{newFrame}')
         frame = self.frames[newFrame]
         frame.tkraise()
+        # TODO change the user to this frames
 
     def uploadWindow(self):
         """
