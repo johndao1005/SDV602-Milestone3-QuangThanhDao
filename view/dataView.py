@@ -1,7 +1,7 @@
 """
 Contain the dataView class which handle the DES window outline as well as upload window view
 """
-import tkinter as tk
+from mttkinter import mtTkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showinfo
 import view.setup as setup
@@ -9,17 +9,17 @@ import view.setup as setup
 from controller.menu.merge_csv import mergeFiles
 from controller.menu.open_csv import selectFile
 from view.DES.DES import genderDES, locationDES, featureDES
+from model.chat import Session
 import threading
-
 class dataView(tk.Tk):
     """Data Explore Screen
     This is the main window which will display all the data regarding the datasource as long as the data is suitable.
     """
-    def __init__(self,name='User', *args, **kwargs):
+    def __init__(self,name='User',):
         """
         start the instance of dataView main window when it is called 
         """
-        tk.Tk.__init__(self, *args, **kwargs)
+        tk.Tk.__init__(self, )
         self.user = name
         self.resizable(0,0)
         # self.geometry("940x800+0+0")
@@ -56,21 +56,7 @@ class dataView(tk.Tk):
         menubar.add_cascade(label="File", menu=filemenu)
         menubar.add_cascade(label="Data view", menu=DESmenu)
         tk.Tk.config(self, menu=menubar)
-        self.mainloop()
-        # thread1 = threading.Thread(target=self.mainloop)
-        # thread2 = threading.Thread(target=self.updateChat)
-        # thread1.start()
-        # print('start Thread 1')
-        # thread2.start()
-        # print('start Thread 2')
-        # thread1.join()
-        # thread2.join()
-        
-    # def updateChat(self):
-    #     self.userList.set('Haha')
-    #     chat = ChatSession(self.user,self.userList,self.chatList)
-    #     chat.update_session()
-        
+
     # ANCHOR load all DES
     def loadDES(self, source=setup.datasource):
         """
@@ -89,7 +75,7 @@ class dataView(tk.Tk):
         Args:
             newFrame (object): the screen to be presented 
         """
-        #self.chat.switch_DES(f'{newFrame}')
+        #self.session.switch_DES(f'{newFrame}')
         frame = self.frames[newFrame]
         frame.tkraise()
         # TODO change the user to this frames

@@ -1,359 +1,220 @@
-# matplotlib
-import matplotlib
-matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from matplotlib.figure import Figure
-import matplotlib.animation as animation
-from matplotlib import style
-from matplotlib import pyplot as plt
-#tkinter
-import tkinter as tk
+# import all the required modules
+import socket
+import threading
+from tkinter import *
+from tkinter import font
 from tkinter import ttk
-#work with url and json file
-from datetime import date
-import requests
-import json
-#pandas and numpy
-import pandas as pd
-import numpy as np
 
-large_font = ("Verdana",12)
-normal_font = ("Verdana",10)
-small_font = ("Verdana",8)
+# import all functions /
+# everything from chat.py file
+#from chat import *
 
-from matplotlib import style
-style.use("ggplot")# other option dark_background,
+PORT = 5050
+SERVER = "192.168.0.103"
+ADDRESS = (SERVER, PORT)
+FORMAT = "utf-8"
 
-
-figure = Figure()
-a = figure.add_subplot(111) # 111 is plot number 1 and 121 is plot number 2
-
-exchange = "BTC-e"
-DatCounter = 9000
-programName = "btce"
-
-def changeExchange(toWhat,pn):
-    global exchange
-    global DatCounter
-    global programName
-    exchange = toWhat
-    programName = pn
-    DatCounter = 9000
-    
-
-def popupmsg(msg):
-    popup = tk.Tk()
-    popup.wm_title("!")
-    label = ttk.Label(popup, text=msg, font=normal_font)
-    label.pack(side="top",fill="x",pady=10)
-    button1 = ttk.Button(popup, text="Okay", command = popup.destroy)
-    popup.mainloop()
-        
-
-def animate(i):
-    #ANCHOR first version
-    # pullData = open("sample_data.txt","r").read()
-    # dataList = pullData.split("\n")
-    # xList = []
-    # yList = []
-    # for eachLine in dataList:
-    #     if len(eachLine)>1:
-    #         x,y = eachLine.split(",")d
-    #         xList.append(int(x))
-    #         yList.append(int(y))
-    # a.clear()
-    # a.plot(xList,yList)
-    
-    #read data
-    #with open(datasource, "r") as data:
-    #   dataList = data.read().split("\n")
-    #   for eachLine in dataList:
-    #if len(eachLine)>1:
-    #         x,y = eachLine.split(",")
-    #         xList.append(int(x))
-    #         yList.append(int(y))
-    #append data
-    # with open(datasource, "a") as data:
-    #   
-    
-    
-    #ANCHOR
-    # API link
-    # dataLink = 'https://btc-e.com/api/3/trades/btc_usd?limit=2000'#add parameter after the api link with ? and the paramter like limit = 2000
-    # using urllib to open datalink
-    # data = request.urlopen(dataLink)
-    # read data from byte and change to utf-8
-    # print(data)
-    # data = data.readall().decode("utf-8")
-    # print(data)
-    # load the data with json
-    # data = json.loads(data)
-    # # using the key to get the value
-    # data = data["btc_usd"]
-    #  using pandas to change to pandas data set
-    # data = pd.DataFrame(data)
-    
-    # buys = data[(data['type']== "bid")]
-    # buys["datestamp"] = np.array(buys["timestamp"]).astype("datetime64[s]")
-    # buyDates = (buys["datestamp"]).tolist()
-    
-    # sells = data[(data['type']== "ask")]
-    # sells["datestamp"] = np.array(sells["timestamp"]).astype("datetime64[s]")
-    # sellDates = (sells["datestamp"]).tolist()
-    
-    # a.clear()
-    # a.plot_date(buyDates,buys["price"])
-    # a.plot_date(sellDates,sells["price"])
-    
-    # btc ban 
-    dataLink = "https://cex.io/api/trade_history/BTC/USD/?status=200"
-    data = requests.request("GET", dataLink)
-    data = data.json()
-    df = pd.DataFrame(data)
-
-    buys = df[(df['type'] == "buy")]
-    buy_arr = buys['date'].to_numpy()
-    blist = []
-    for i in buy_arr:
-        # print(i)
-        abuy = date.fromtimestamp(int(i))
-        blist.append(abuy)
-
-    buys["datestamp"] = blist
-    print(buys["datestamp"])
-
-    buyDates = (buys["datestamp"]).tolist()
+# Create a new client socket
+# and connect to the server
+client = socket.socket(socket.AF_INET,
+					socket.SOCK_STREAM)
+client.connect(ADDRESS)
 
 
-    sells = df[(df['type'] == "sell")]
-    sell_arr = sells['date'].to_numpy()
-    slist = []
-    for i in sell_arr:
-        # print(i)
-        asell = date.fromtimestamp(int(i))
-        slist.append(asell)
+# GUI class for the chat
+class GUI:
+	# constructor method
+	def __init__(self):
+	
+		# chat window which is currently hidden
+		self.Window = Tk()
+		self.Window.withdraw()
+		
+		# login window
+		self.login = Toplevel()
+		# set the title
+		self.login.title("Login")
+		self.login.resizable(width = False,
+							height = False)
+		self.login.configure(width = 400,
+							height = 300)
+		# create a Label
+		self.pls = Label(self.login,
+					text = "Please login to continue",
+					justify = CENTER,
+					font = "Helvetica 14 bold")
+		
+		self.pls.place(relheight = 0.15,
+					relx = 0.2,
+					rely = 0.07)
+		# create a Label
+		self.labelName = Label(self.login,
+							text = "Name: ",
+							font = "Helvetica 12")
+		
+		self.labelName.place(relheight = 0.2,
+							relx = 0.1,
+							rely = 0.2)
+		
+		# create a entry box for
+		# tyoing the message
+		self.entryName = Entry(self.login,
+							font = "Helvetica 14")
+		
+		self.entryName.place(relwidth = 0.4,
+							relheight = 0.12,
+							relx = 0.35,
+							rely = 0.2)
+		
+		# set the focus of the cursor
+		self.entryName.focus()
+		
+		# create a Continue Button
+		# along with action
+		self.go = Button(self.login,
+						text = "CONTINUE",
+						font = "Helvetica 14 bold",
+						command = lambda: self.goAhead(self.entryName.get()))
+		
+		self.go.place(relx = 0.4,
+					rely = 0.55)
+		self.Window.mainloop()
 
-    sells["datestamp"] = slist
-    sellDates = (sells["datestamp"]).tolist()
+	def goAhead(self, name):
+		self.login.destroy()
+		self.layout(name)
+		
+		# the thread to receive messages
+		rcv = threading.Thread(target=self.receive)
+		rcv.start()
 
-    # print(buyDates)
-    # print(sellDates)
+	# The main layout of the chat
+	def layout(self,name):
+	
+		self.name = name
+		# to show chat window
+		self.Window.deiconify()
+		self.Window.title("CHATROOM")
+		self.Window.resizable(width = False,
+							height = False)
+		self.Window.configure(width = 470,
+							height = 550,
+							bg = "#17202A")
+		self.labelHead = Label(self.Window,
+							bg = "#17202A",
+							fg = "#EAECEE",
+							text = self.name ,
+							font = "Helvetica 13 bold",
+							pady = 5)
+		
+		self.labelHead.place(relwidth = 1)
+		self.line = Label(self.Window,
+						width = 450,
+						bg = "#ABB2B9")
+		
+		self.line.place(relwidth = 1,
+						rely = 0.07,
+						relheight = 0.012)
+		
+		self.textCons = Text(self.Window,
+							width = 20,
+							height = 2,
+							bg = "#17202A",
+							fg = "#EAECEE",
+							font = "Helvetica 14",
+							padx = 5,
+							pady = 5)
+		
+		self.textCons.place(relheight = 0.745,
+							relwidth = 1,
+							rely = 0.08)
+		
+		self.labelBottom = Label(self.Window,
+								bg = "#ABB2B9",
+								height = 80)
+		
+		self.labelBottom.place(relwidth = 1,
+							rely = 0.825)
+		
+		self.entryMsg = Entry(self.labelBottom,
+							bg = "#2C3E50",
+							fg = "#EAECEE",
+							font = "Helvetica 13")
+		
+		# place the given widget
+		# into the gui window
+		self.entryMsg.place(relwidth = 0.74,
+							relheight = 0.06,
+							rely = 0.008,
+							relx = 0.011)
+		
+		self.entryMsg.focus()
+		
+		# create a Send Button
+		self.buttonMsg = Button(self.labelBottom,
+								text = "Send",
+								font = "Helvetica 10 bold",
+								width = 20,
+								bg = "#ABB2B9",
+								command = lambda : self.sendButton(self.entryMsg.get()))
+		
+		self.buttonMsg.place(relx = 0.77,
+							rely = 0.008,
+							relheight = 0.06,
+							relwidth = 0.22)
+		
+		self.textCons.config(cursor = "arrow")
+		
+		# create a scroll bar
+		scrollbar = Scrollbar(self.textCons)
+		
+		# place the scroll bar
+		# into the gui window
+		scrollbar.place(relheight = 1,
+						relx = 0.974)
+		
+		scrollbar.config(command = self.textCons.yview)
+		
+		self.textCons.config(state = DISABLED)
 
-    a.clear()
-    a.plot_date(buyDates, buys["price"], "#00a3e0", label="buys")
-    a.plot_date(sellDates, sells["price"], "#183a54", label="sells")
+	# function to basically start the thread for sending messages
+	def sendButton(self, msg):
+		self.textCons.config(state = DISABLED)
+		self.msg=msg
+		self.entryMsg.delete(0, END)
+		snd= threading.Thread(target = self.sendMessage)
+		snd.start()
 
-    a.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
+	# function to receive messages
+	def receive(self):
+		while True:
+			try:
+				message = client.recv(1024).decode(FORMAT)
+				
+				# if the messages from the server is NAME send the client's name
+				if message == 'NAME':
+					client.send(self.name.encode(FORMAT))
+				else:
+					# insert messages to text box
+					self.textCons.config(state = NORMAL)
+					self.textCons.insert(END,
+										message+"\n\n")
+					
+					self.textCons.config(state = DISABLED)
+					self.textCons.see(END)
+			except:
+				# an error will be printed on the command line or console if there's an error
+				print("An error occured!")
+				client.close()
+				break
+		
+	# function to send messages
+	def sendMessage(self):
+		self.textCons.config(state=DISABLED)
+		while True:
+			message = (f"{self.name}: {self.msg}")
+			client.send(message.encode(FORMAT))
+			break
 
-    title = "BTC-e BTCUSD prices\n Last Price: "+str(df["price"][999])
-    a.set_title(title)
-    
-    
-class App(tk.Tk):
-    def __init__(self,*args,**kwargs):
-        tk.Tk.__init__(self,*args,**kwargs)
-        container = tk.Frame(self)
-        container.pack(side = 'top',fill = 'both', expand = True)
-        container.grid_rowconfigure(0,weight = 1)
-        container.grid_columnconfigure(0,weight = 1)
-        
-        menubar = tk.Menu(container)
-        filemenu = tk.Menu(menubar, tearoff = 0)
-        filemenu.add_command(label = "Save settings",command = lambda: popupmsg("Not support yet"))
-        filemenu.add_separator()
-        filemenu.add_command(label = "exit",command = quit)
-        menubar.add_cascade(label = "File",menu=filemenu)
-        
-        exchangeChoice = tk.Menu(menubar,tearoff=1)
-        exchangeChoice.add_command(label="BTC-e",
-                                   command = lambda: changeExchange("BTC-e","btce"))
-        exchangeChoice.add_command(label="Bitfinex",
-                                   command = lambda: changeExchange("Bitfinex","bitfinex"))
-        exchangeChoice.add_command(label="Bitstamp",
-                                   command = lambda: changeExchange("Bitstamp","bitstamp"))
-        menubar.add_cascade(label ="exchange" ,menu =exchangeChoice)
-        
-        # dataTF = tk.Menu(menubar,tearoff=1)
-        # dataTF.add_command(label="Tick",
-        #                            command = lambda: changeTimeFrame("tick"))
-        # dataTF.add_command(label="1 Day",
-        #                            command = lambda: changeTimeFrame("1d"))
-        # dataTF.add_command(label="3 Days",
-        #                            command = lambda: changeTimeFrame("3d"))
-        # dataTF.add_command(label="7 Days",
-        #                            command = lambda: changeTimeFrame("7d"))
-        # menubar.add_cascade(label ="Data Time Frame" ,menu =dataTF)
-        
-        tk.Tk.config(self,menu=menubar)
-        
-        self.frames ={}
-        for DES in (StartPage,PageOne,PageTwo,PageThree):
-            frame = DES(container, self)
-            self.frames[DES] = frame
-            frame.grid(row=0,column = 0, sticky = "nsew")
-        self.show_frame(StartPage)
-        
-    def show_frame(self,cont):
-        frame = self.frames[cont]
-        frame.tkraise()
-
-class StartPage(tk.Frame):
-    def __init__(self,parent,controller):
-        tk.Frame.__init__(self,parent)
-        label = ttk.Label(self,text="STart Page")
-        label.pack(pady=10,padx=10)
-        button1 = ttk.Button(self, text ="Visit Page 1",
-                            command=lambda:controller.show_frame(PageOne))
-        button1.pack()
-        button2 = ttk.Button(self, text ="Visit Page 2",
-                            command=lambda:controller.show_frame(PageTwo))
-        button2.pack()
-        button3 = ttk.Button(self, text ="Visit Page 3",
-                            command=lambda:controller.show_frame(PageThree))
-        button3.pack()
-        button4 = ttk.Button(self, text ="Visit Page 4",
-                            command=lambda:controller.show_frame(PageOne))
-        button4.pack()
-        
-class PageOne(tk.Frame):
-    def __init__(self,parent,controller):
-        tk.Frame.__init__(self,parent)
-        label = tk.Label(self,text="Page One")
-        label.pack(pady=10,padx=10)
-        button1 = ttk.Button(self, text ="Back To Home",
-                            command=lambda:controller.show_frame(StartPage))
-        button1.pack()
-        button2 = ttk.Button(self, text ="Visit Page 1",
-                            command=lambda:controller.show_frame(PageTwo))
-        button2.pack()
-        
-class PageTwo(tk.Frame):
-    def __init__(self,parent,controller):
-        tk.Frame.__init__(self,parent)
-        label = ttk.Label(self,text="Page Two")
-        label.pack(pady=10,padx=10)
-        button1 = ttk.Button(self, text ="Back To Home",
-                            command=lambda:controller.show_frame(StartPage))
-        button1.pack()
-        button2 = ttk.Button(self, text ="Page PageOne",
-                            command=lambda:controller.show_frame(PageOne))
-        button2.pack()
-        
-class PageThree(tk.Frame):
-    def __init__(self,parent,controller):
-        tk.Frame.__init__(self,parent)
-        label = tk.Label(self,text="Graph Page")
-        label.pack(pady=10,padx=10)
-        
-        # graph
-        
-        canvas = FigureCanvasTkAgg(figure, self,)
-        canvas.draw()
-        
-        toolbar = NavigationToolbar2Tk(canvas,self)
-        toolbar.update()
-        canvas._tkcanvas.pack()
-        canvas.get_tk_widget().pack(expand=True)
-        
-        # buttons
-        button1 = ttk.Button(self, text ="Back To Home",
-                            command=lambda:controller.show_frame(StartPage))
-        button1.pack()
-        # button2 = ttk.Button(self, text ="Visit Page 1",
-        #                     command=lambda:controller.show_frame(PageOne))
-        # button2.pack()
-        # button3 = ttk.Button(self, text ="Visit Page 1",
-        #                     command=lambda:controller.show_frame(PageTwo))
-        # button3.pack()
-        
-import matplotlib
-import numpy as np
-
-matplotlib.use("TkAgg")
-
-x = np.linspace(0, 2*np.pi, 1024)
-
-class TransientAnalysis(tk.Tk):
-
-    pages = ((1, 'Switch to "-"', '-', '+', 'orange'),
-             (-1, 'Switch to "+"', '+', '-', 'olive'))
-
-    def __init__(self, *args, **kwargs):
-        self._running_anim = None
-        tk.Tk.__init__(self, *args, **kwargs)
-        tk.Tk.wm_title(self, "Transient Analysis GUI: v1.0")
-
-        container = tk.Frame(self)
-        container.pack(side="top", fill="both", expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
-
-        self.frames = {}
-
-        for (direction, text, other_key, my_key, color) in self.pages:
-
-            frame = MovingSinGraphPage(direction, text, other_key,
-                                       my_key, color,
-                                       container, self)
-
-            self.frames[my_key] = frame
-
-            frame.grid(row=0, column=0, sticky="nsew")
-
-    def show_frame(self, cont):
-
-        frame = self.frames[cont]
-        frame.tkraise()
-        frame.canvas.draw_idle()
-
-
-class MovingSinGraphPage(tk.Frame):
-    def __init__(self, move_dir, text, other_key, my_key,
-                 color, parent, controller):
-        self._sgn = np.sign(move_dir)
-        tk.Frame.__init__(self, parent)
-        button1 = ttk.Button(self, text=text,
-                            command=(
-                            lambda: controller.show_frame(other_key)))
-        button1.grid(row=1, column=0, pady=20, padx=10, sticky='w')
-        # make mpl objects
-        a = Figure(figsize=(4, 4))
-        plot_a = a.add_subplot(111)
-        # set up the axes limits and title
-        plot_a.set_title(my_key)
-        plot_a.set_xlim([0, 2*np.pi])
-        plot_a.set_ylim([-1, 1])
-        # make and stash the plot artist
-        lna, = plot_a.plot([], [], color=color, lw=5)
-        self._line = lna
-
-        # make the canvas to integrate with Tk
-        canvasA = FigureCanvasTkAgg(a, self)
-        canvasA.draw()
-        canvasA.get_tk_widget().grid(
-            row=1, column=1, pady=20, padx=10, sticky='nsew')
-
-        # stash the canvas so that we can use it above to ensure a re-draw
-        # when we switch to this page
-        self.canvas = canvasA
-        # create and save the animation
-        self.anim = animation.FuncAnimation(a, self.update,
-                                            interval=100)
-
-    def update(self, i):
-        self._line.set_xdata(x)
-        self._line.set_ydata(np.sin(x + self._sgn * i * np.pi / 10))
-
-
-      
-
-if __name__ == "__main__":    
-    # app = App()
-    # app.geometry("1280x720")
-    # ani = animation.FuncAnimation(figure,animate, interval = 5000)
-    # app.mainloop()
-    app = TransientAnalysis()
-    app.geometry("800x600")
-    app.mainloop()  
-    
-    
+# create a GUI class object
+g = GUI()

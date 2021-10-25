@@ -29,7 +29,7 @@ def makeUser(window,name,pw,pw2,email):
                 error += "\nThe confirm password must be the same as pasword"
             if not re.fullmatch(regex, email):
                 error += "\nEnter a valid email address"
-            elif db["users"].find({"email":email}).count() != 0:
+            elif db["users"].count_documents({'email' : email.strip()}) != 0:
                 error += "\nThe Email is already in use"
                 
             #check if there is no error then create users
@@ -40,6 +40,7 @@ def makeUser(window,name,pw,pw2,email):
                 hashed = bcrypt.hashpw(str.encode(pw), bcrypt.gensalt())
                 db["users"].insert_one(
                     {"name":name,
+                     "online":False,
                     "password": hashed,
                     "email":email
                     })

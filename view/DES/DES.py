@@ -3,10 +3,15 @@ Setup screen for each DES which is a frame to be displayed on main window datavi
 afterward each DES will inherit from DES but responsible for displaying different type of data and graph.
 """
 from view.chart_create import draw_graph
-import tkinter as tk
+from mttkinter import mtTkinter as tk
 from tkinter import ttk
 import view.setup as setup
 from controller.menu.logout import logout
+from config.db import connectDB
+import threading
+import queue
+
+newline = '\n'
 
 
 class DES(tk.Frame):
@@ -30,6 +35,7 @@ class DES(tk.Frame):
             window (variable): the frame or container which hold the 3 DES screen
             dataview (object): The main window which responsible for main functionality and data source
         """
+        self.lastModified = ''
         next = self.nextDES
         prev = self.prevDES
         frame = self.frametype
@@ -55,53 +61,72 @@ class DES(tk.Frame):
         rightSide = ttk.Frame()
         rightSide.grid(column=4, row=0, **setup.pad20,
                        columnspan=2, sticky="N")
-        label = ttk.Label(rightSide, text=f"Current user {dataview.user}", font=setup.normal).grid(
+        label = ttk.Label(rightSide, text=f"View data as {dataview.user}", font=setup.normal).grid(
             column=0, row=0)
         Location_self = ttk.Button(rightSide,
                                    text="Sign out",
-                                   command=lambda: logout(self)
+                                   command=lambda: logout(dataview)
                                    ).grid(column=1, row=0)
         # TODO add scrollbar support
         frame1 = ttk.LabelFrame(rightSide, text="Chat box", borderwidth=0)
         frame1.grid(column=0, row=1, **setup.pad20, columnspan=2)
-        userLog = tk.Text(frame1,
-                           bg='white',
-                           font=setup.normal,
-                           height =3, width = 50,yscrollcommand=set()
-                           )
-        userLog.grid(column=0, row=0, **setup.pad20, columnspan=2)
-        chatLog = tk.Text(frame1,
-                           bg='white',
-                           font=setup.normal,
-                           height =10,
-                           width=50
-                           )
-        chatLog.grid(column=0, row=1, **setup.pad20, columnspan=2)
-        chatLog['state']= 'disabled'
-        userLog['state']= 'disabled'
-        
-        entry = ttk.Entry(frame1, textvariable=input,width=40,font = setup.normal).grid(
+        self.userLog = tk.Text(frame1,
+                               bg='white',
+                               font=setup.normal,
+                               height=3, width=50, yscrollcommand=set()
+                               )
+        self.userLog.grid(column=0, row=0, **setup.pad20, columnspan=2)
+        self.chatLog = tk.Text(frame1,
+                               bg='white',
+                               font=setup.normal,
+                               height=10,
+                               width=50
+                               )
+        self.chatLog.grid(column=0, row=1, **setup.pad20, columnspan=2)
+        self.chatLog['state']= 'disable'
+        self.userLog['state']= 'disable'
+        entry = ttk.Entry(frame1, textvariable=input, width=40, font=setup.normal).grid(
             column=0, row=2, **setup.pad10, sticky="E")
         button = ttk.Button(frame1,
                             text="Send",
-                            command=lambda: self.show_frame(next)
+                            command=lambda: dataview.show_frame(next)
                             ).grid(column=1, row=2, **setup.pad10, sticky="E")
-        
+
         # ANCHOR Data control frame
         frame2 = ttk.LabelFrame(rightSide, text="Data Control", borderwidth=0)
         frame2.grid(column=0, row=2, **setup.pad20, columnspan=2, sticky="NEW")
         button = ttk.Button(frame2,
                             text="Update",
-                            command=lambda: self.loadDES()
-                            ).grid(column=0, row=1, padx=20,sticky="E")
+                            command=lambda: dataview.loadDES()
+                            ).grid(column=0, row=1, padx=20, sticky="E")
         button = ttk.Button(frame2,
                             text="Upload",
-                            command=lambda: self.openUpload()
-                            ).grid(column=1, row=1, pady=20,sticky="E")
+                            command=lambda: dataview.openUpload()
+                            ).grid(column=1, row=1, pady=20, sticky="E")
         button = ttk.Button(rightSide,
                             text="Quit",
                             command=lambda: self.quit()  # ANCHOR need change to close chat session
                             ).grid(column=1, row=3, sticky="E", **setup.pad20)
+        self.database = connectDB()
+        self.update()
+
+    def update(self):
+        print('start update')
+        self.chatLog.insert('1.0','helllo \n nice to see you')
+        self.session = self.database['chat'].find_one(
+            {'DES': f'{self.frametype}DES'})
+        if self.session['lastModified'].strftime('%Y-%m-%d %H:%M:%S') != self.lastModified:
+            self.chatLog['state']= 'normal'
+            self.userLog['state']= 'normal'
+            self.userLog.insert('1.0', newline.join(
+                [user for user in self.session['user-list'] if isinstance(user, str)]))
+            # print(type(newline.join(
+            #     [user for user in self.session['user-list'] if isinstance(user, str)])))
+            self.chatLog.insert('1.0', newline.join(
+                [user for user in self.session['chat-list']]))
+            self.lastModified = self.session['lastModified']
+            self.chatLog['state']= 'disable'
+            self.userLog['state']= 'disable'
 
 
 class genderDES(DES):
@@ -140,7 +165,7 @@ class locationDES(DES):
 
 class featureDES(DES):
     """Generate feature DES which is a child of DES template
-
+    
     Args:
         DES (object): DES template
     """
@@ -153,3 +178,4 @@ class featureDES(DES):
         self.prevDES = locationDES
         self.frametype = "feature"
         self.DES_setup(self, dataview)
+        self.update()

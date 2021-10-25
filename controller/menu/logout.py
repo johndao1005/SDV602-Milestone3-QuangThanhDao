@@ -1,3 +1,4 @@
+
 def logout(dataview):
     """Function destroy the current data view window and display the a new login screen
 
@@ -5,6 +6,7 @@ def logout(dataview):
         dataview (variable): data view main window
     """
     from view.login import Login
-    dataview.chat.check = False
     dataview.destroy()
+    # TODO remove the active label in the user database
+    
     Login().mainloop()

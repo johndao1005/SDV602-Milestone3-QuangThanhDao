@@ -115,3 +115,4 @@ class Login(tk.Tk):
         """
         self.check = False
         self.signup.destroy()
+        #TODO can add function to add the newly created user details into the signup window and maybe remember me?
