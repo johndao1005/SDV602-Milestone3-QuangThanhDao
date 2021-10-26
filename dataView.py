@@ -11,6 +11,7 @@ from open_csv import selectFile
 from DES import genderDES, locationDES, featureDES
 import threading
 from chat import Session
+import time
 
 class dataView(tk.Tk):
     """Data Explore Screen
@@ -88,11 +89,12 @@ class dataView(tk.Tk):
                                )
         self.chatLog.grid(column=0, row=1, **setup.pad20, columnspan=2)
         
-        entry = ttk.Entry(frame1, textvariable=input, width=40, font=setup.normal).grid(
+        self.entry = ttk.Entry(frame1, textvariable=input, width=40, font=setup.normal)
+        self.entry.grid(
             column=0, row=2, **setup.pad10, sticky="E")
         button = ttk.Button(frame1,
                             text="Send",
-                            command=lambda: dataview.show_frame(next)
+                            command=lambda: self.chatSession.send_message(self.entry.get(),self)
                             ).grid(column=1, row=2, **setup.pad10, sticky="E")
         # ANCHOR Data control frame
         frame2 = ttk.LabelFrame(rightSide, text="Data Control", borderwidth=0)
@@ -113,6 +115,8 @@ class dataView(tk.Tk):
         
     def startSession(self):
         self.chatSession = Session(self.user)
+        self.firstDES = True
+        self.flag = False
     
     def update(self,users,chat):
         self.chatLog['state']= 'normal'
@@ -142,13 +146,30 @@ class dataView(tk.Tk):
         Args:
             newFrame (object): the screen to be presented 
         """
+        if self.firstDES == False:
+            self.flag = True
+            #self.thread.join()
+        self.firstDES = False
         frame = self.frames[newFrame]
-        self.chatSession.switch_DES(f'{frame.frametype}DES')
-        users,chat = self.chatSession.getData(f'{frame.frametype}DES')
-        print(users,chat)
+        self.DES = f'{frame.frametype}DES'
+        self.chatSession.switch_DES(self.DES)
+        users,chat = self.chatSession.getData(self.DES)
         self.update(users,chat)
         frame.tkraise()
+        self.thread = threading.Thread(target=self.updateChat,daemon=True)
+        self.thread.start()
         
+    def updateChat(self):
+        self.flag = False
+        while True:
+            if self.flag:
+                break
+            time.sleep(2)
+            users,chat = self.chatSession.getData(self.DES)
+            self.update(users,chat)
+            
+    def clearEntry(self):
+        self.entry.delete(0,tk.END)
 
 
     def uploadWindow(self):
