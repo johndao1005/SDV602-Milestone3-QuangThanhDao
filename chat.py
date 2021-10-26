@@ -25,16 +25,6 @@ class Session():
     def send_message(self,message):
         message = f'{self.user} ({now.strftime("%H:%M")}): {message}'
         self.database.find_one_and_update({'DES':self.DES},{'$push':{'chat-list':message}})
-    
-    def start_session (self):
-        self.database.update_one(
-            {'DES':self.DES},
-            {'$addToSet':{'user-list':self.user},
-            '$currentDate': {
-            'lastModified': True
-            }
-            },
-            upsert=True)
         
     def resetchat(self,DES):
         self.database.update_one(
@@ -43,7 +33,7 @@ class Session():
             },
         )
     
-    def update(self,DES):
+    def getData(self,DES):
         # while True:
         #     if self.check:
         #         break
