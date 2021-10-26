@@ -1,7 +1,7 @@
 from tkinter.messagebox import showinfo, showerror
-from config.db import connectDB
+from db import connectDB
 import bcrypt
-
+from dataView import dataView
 def authentication(parent, email, pw):
     """Function to check the if username and password is correct then destroy the login window
         and open the main menu to allow users interact with the application
@@ -25,6 +25,6 @@ def authentication(parent, email, pw):
                 parent.destroy()
                 # Active this line when everything is done
                 #db['users'].update_one({'name':currentUser['name']},{'$set':{'online':True}})
-                threads(currentUser['name'])
+                dataView(currentUser['name'])
         else:
             showerror("Incorrect email/password","Please check your email and password and try again")

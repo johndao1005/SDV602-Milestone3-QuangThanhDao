@@ -2,12 +2,11 @@
 Setup screen for each DES which is a frame to be displayed on main window dataview. DES is the template which handle displaying data as well as holding the buttons
 afterward each DES will inherit from DES but responsible for displaying different type of data and graph.
 """
-from view.chart_create import draw_graph
+from chart_create import draw_graph
 from mttkinter import mtTkinter as tk
 from tkinter import ttk
-import view.setup as setup
-from controller.menu.logout import logout
-from config.db import connectDB
+import setup as setup
+from logout import logout
 
 newline = '\n'
 
@@ -43,11 +42,11 @@ class DES(tk.Frame):
         button = ttk.Button(self,
                             text="Next",
                             command=lambda: dataview.show_frame(next)
-                            ).grid(column=1, row=2, **setup.pad20)
+                            ).grid(column=2, row=2, **setup.pad20)
         button = ttk.Button(self,
                             text="Previous",
                             command=lambda: dataview.show_frame(prev)
-                            ).grid(column=2, row=2, **setup.pad20)
+                            ).grid(column=1, row=2, **setup.pad20)
 
         # ANCHOR chat section
 
@@ -70,18 +69,17 @@ class DES(tk.Frame):
         self.userLog = tk.Text(frame1,
                                bg='white',
                                font=setup.normal,
-                               height=3, width=50, yscrollcommand=set()
+                               height=4, width=50, yscrollcommand=set()
                                )
         self.userLog.grid(column=0, row=0, **setup.pad20, columnspan=2)
         self.chatLog = tk.Text(frame1,
                                bg='white',
                                font=setup.normal,
-                               height=10,
+                               height=12,
                                width=50
                                )
         self.chatLog.grid(column=0, row=1, **setup.pad20, columnspan=2)
-        self.chatLog['state']= 'disable'
-        self.userLog['state']= 'disable'
+        
         entry = ttk.Entry(frame1, textvariable=input, width=40, font=setup.normal).grid(
             column=0, row=2, **setup.pad10, sticky="E")
         button = ttk.Button(frame1,
@@ -104,26 +102,37 @@ class DES(tk.Frame):
                             text="Quit",
                             command=lambda: self.quit()  # ANCHOR need change to close chat session
                             ).grid(column=1, row=3, sticky="E", **setup.pad20)
-        self.database = connectDB()
-        self.update()
 
-    def update(self):
-        print('start update')
-        self.chatLog.insert('1.0','helllo \n nice to see you')
-        self.session = self.database['chat'].find_one(
-            {'DES': f'{self.frametype}DES'})
-        if self.session['lastModified'].strftime('%Y-%m-%d %H:%M:%S') != self.lastModified:
-            self.chatLog['state']= 'normal'
-            self.userLog['state']= 'normal'
-            self.userLog.insert('1.0', newline.join(
-                [user for user in self.session['user-list'] if isinstance(user, str)]))
-            # print(type(newline.join(
-            #     [user for user in self.session['user-list'] if isinstance(user, str)])))
-            self.chatLog.insert('1.0', newline.join(
-                [user for user in self.session['chat-list']]))
-            self.lastModified = self.session['lastModified']
-            self.chatLog['state']= 'disable'
-            self.userLog['state']= 'disable'
+    def update(self,users,chat):
+        self.userLog.insert('1.0',users)
+        self.chatLog.insert('1.0',chat)
+        self.chatLog['state']= 'disable'
+        self.userLog['state']= 'disable'
+        
+    def resetChat(self):
+        self.chatLog['state']= 'normal'
+        self.userLog['state']= 'normal'
+        self.userLog.delete('1.0',tk.END)
+        self.chatLog.delete('1.0',tk.END)
+        
+        
+    # def update(self):
+    #     print('start update')
+    #     self.chatLog.insert('1.0','helllo \n nice to see you')
+    #     self.session = self.database['chat'].find_one(
+    #         {'DES': f'{self.frametype}DES'})
+    #     if self.session['lastModified'].strftime('%Y-%m-%d %H:%M:%S') != self.lastModified:
+    #         self.chatLog['state']= 'normal'
+    #         self.userLog['state']= 'normal'
+    #         self.userLog.insert('1.0', newline.join(
+    #             [user for user in self.session['user-list'] if isinstance(user, str)]))
+    #         # print(type(newline.join(
+    #         #     [user for user in self.session['user-list'] if isinstance(user, str)])))
+    #         self.chatLog.insert('1.0', newline.join(
+    #             [user for user in self.session['chat-list']]))
+    #         self.lastModified = self.session['lastModified']
+    #         self.chatLog['state']= 'disable'
+    #         self.userLog['state']= 'disable'
 
 
 class genderDES(DES):
@@ -175,4 +184,3 @@ class featureDES(DES):
         self.prevDES = locationDES
         self.frametype = "feature"
         self.DES_setup(self, dataview)
-        self.update()

@@ -1,26 +1,7 @@
-#from config.db import connectDB
+from db import connectDB
 from datetime import datetime, date
 from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
 
-
-from pymongo import MongoClient
-from dotenv import load_dotenv
-from pathlib import Path
-import os
-import certifi
-ca = certifi.where()
-load_dotenv()
-env_path = Path('.')/'.env'
-load_dotenv(dotenv_path=env_path)
-
-MONGO_URI = os.getenv("MONGO_URI")
-def connectDB():
-    try:
-        client = MongoClient(f"{MONGO_URI}",tlsCAFile=ca)
-        print("Connect to Database")
-        return client["white-shark"]
-    except:
-        print("Connection failed")
 
 today = date.today().strftime("%d/%m/%Y")
 now = datetime.now()
@@ -29,20 +10,17 @@ newline = "\n"
 
 class Session():
     def __init__(self,username):
-        self.check = True
-        self.DES = 'genderDES'
+        self.check = False
         self.user = username
         self.lastModified = ""
         db = connectDB()
         self.database = db['chat']
-        self.start_session()
         
-    def switch_DES(self,DES):
+    def switch_DES(self,newDES):
         self.database.bulk_write([
-            UpdateOne({'DES':DES},{'$addToSet':{'user-list':self.user}}),
-            UpdateOne({'DES':self.DES},{'$pull':{'user-list':self.user}})
+            UpdateOne({'user-list':self.user},{'$pull':{'user-list':self.user}}),
+            UpdateOne({'DES':newDES},{'$addToSet':{'user-list':self.user}})
         ])
-        self.DES = DES
         
     def send_message(self,message):
         message = f'{self.user} ({now.strftime("%H:%M")}): {message}'
@@ -66,12 +44,12 @@ class Session():
         )
     
     def update(self,DES):
-        while True:
+        # while True:
+        #     if self.check:
+        #         break
             self.session = self.database.find_one({'DES':DES})
             if self.session['lastModified'].strftime('%Y-%m-%d %H:%M:%S') != self.lastModified:
-                print(newline.join([user for user in self.session['user-list'] if isinstance(user,str)]))
-                print('chat')
-                print(newline.join([message for message in self.session['chat-list']]))
+                return(newline.join([user for user in self.session['user-list'] if isinstance(user,str)]),newline.join([message for message in self.session['chat-list']]))
     
     def logoutChat(self):
         self.database.update_one(
