@@ -12,7 +12,9 @@ from DES import genderDES, locationDES, featureDES
 import threading
 from chat import Session
 import time
+import queue
 
+threadQueue = queue.Queue()
 class dataView(tk.Tk):
     """Data Explore Screen
     This is the main window which will display all the data regarding the datasource as long as the data is suitable.
@@ -112,7 +114,8 @@ class dataView(tk.Tk):
                             command=lambda: self.quit() ).grid(column=2, row=1,sticky="E",**setup.pad20)
         self.startSession()
         self.loadDES()
-        
+
+    #may setup 3 threads right away 
     def startSession(self):
         self.chatSession = Session(self.user)
         self.firstDES = True
@@ -167,6 +170,7 @@ class dataView(tk.Tk):
             time.sleep(2)
             users,chat = self.chatSession.getData(self.DES)
             self.update(users,chat)
+            
             
     def clearEntry(self):
         self.entry.delete(0,tk.END)
