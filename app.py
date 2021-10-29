@@ -12,7 +12,4 @@ if __name__ == '__main__':
     """
     Initiate the app
     """
-    from dataView import DataView
-    # start()
-    app = DataView()
-    app.mainloop()
+    start()

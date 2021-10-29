@@ -18,8 +18,5 @@ def selectFile(action,target):
             initialdir='./data-sample',
             filetypes=filetypes)
     
-    if action =="merge":
+    if action =="upload":
         target.insert(END,filename)
-        
-    if action =="open":
-        target.loadDES(filename)

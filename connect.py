@@ -1,7 +1,7 @@
 from db import connectDB
 import bcrypt
 from datetime import datetime
-from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
+from pymongo import UpdateOne
 
 newline = "\n"
 
@@ -10,10 +10,6 @@ class UserControl():
         db = connectDB()
         self.userDatabase = db['users']
         
-    def logout(self,user):
-        self.userDatabase.update_one({'name':user},
-                {'$set': {'online': False}})
-        
     def check(self,field,value):
         return self.userDatabase.count_documents({field : value})
         
@@ -21,7 +17,6 @@ class UserControl():
         hashed = bcrypt.hashpw(str.encode(password), bcrypt.gensalt())
         self.userDatabase.insert_one(
                     {"name":username,
-                    "online":False,
                     "password": hashed,
                     "email":email,
                     'chance':3
@@ -34,11 +29,7 @@ class UserControl():
                 bytePassword = str.encode(password)
                 if bcrypt.checkpw(bytePassword, user['password']):
                     self.userDatabase.find_one_and_update({"email":email.strip()},{'$set':{'chance':3}})
-                    if user["online"] == True:
-                        return ("The user is already logged in. Please contact admin if you think your details is hacked")
-                    else:
-                        #self.userDatabase.update_one({'email': email},{'$set': {'online': True}})
-                        return user
+                    return user
                 else:
                     user = self.userDatabase.find_one_and_update({"email":email},{'$inc':{'chance':-1}})
                     return f"Wrong password. Please contact admin if you forget your password, {user['chance']} tries left"
@@ -81,7 +72,21 @@ class Session():
         session = self.chatDatabase.find_one({'DES': DES}, {'lastModified': 1})
         return session['lastModified']
 
+class DataHandler():
+    def __init__(self):
+        db = connectDB()
+        self.database = db['data']
+    
+    def uploadData(self, data):
+        self.database.update_one({'master':True},{'$currentDate': {'lastModified': True}})
+        self.database.insert_many(data)
+        
+    def retrieveData(self):
+        return self.database.find({'master':{'$exists':False}})
+    
+    def checkRecord(self):
+        return self.database.find_one({'master':True})['lastModified']
+    
+
 if __name__ == '__main__':
-    usercontrol = Session('Kim')
-    usercontrol.endSession('Kim')
-    print('finish')
+    pass

@@ -7,9 +7,9 @@ from tkinter.messagebox import showinfo
 import view.setup as setup
 
 from merge_csv import mergeFiles
-from open_csv import selectFile
+from upload import selectFile
 from DES import genderDES, locationDES, featureDES
-from connect import Session,UserControl
+from connect import Session,UserControl,DataHandler
 
 class DataView(tk.Tk):
     """Data Explore Screen
@@ -57,21 +57,24 @@ class DataView(tk.Tk):
         tk.Tk.config(self, menu=menubar)
         # START CHAT AND LOAD DES
         self.chatSession = Session(self.user)
-        self.userControl = UserControl()
         self.loadDES()
+        self.userControl = UserControl()
+        self.dataHandler = DataHandler()
+        self.lastModified = self.dataHandler.checkRecord()
+        
     
     # ANCHOR load all DES
-    def loadDES(self, source=setup.datasource):
+    def loadDES(self):#, source=setup.datasource):
         """
         Load the data explorer screen with the given data source else load the default data source
         """
-        self.source = source
+        #self.source = source
         for DES in (genderDES, locationDES, featureDES):
             frame = DES(self.container, self)
             frame.thread.start()
             self.frames[DES] = frame
             frame.grid(row=0, column=0, sticky="nsew")
-        self.show_frame(locationDES)
+        self.show_frame(featureDES)
 
 
     def show_frame(self, newFrame):
@@ -100,29 +103,19 @@ class DataView(tk.Tk):
         self.upload.geometry("420x200+1000+200")
         self.upload.protocol("WM_DELETE_WINDOW", self.closeUpload)
         target = tk.StringVar()
-        source = tk.StringVar()
-        label = ttk.Label(self.upload, text="Target File").grid(
+        label = ttk.Label(self.upload, text="Upload File").grid(
             column=0, row=2, **options)
         text = tk.Entry()
         self.target_entry = tk.Entry(self.upload, textvariable=target)
         self.target_entry.grid(
             column=1, row=2, **options, columnspan=3)
-        label = ttk.Label(self.upload, text="Source File").grid(
-            column=0, row=3, **options)
-        self.source_entry = ttk.Entry(self.upload, textvariable=source)
-        self.source_entry.grid(
-            column=1, row=3, **options, columnspan=3)
         browse_file = ttk.Button(self.upload,
                                  text="Select",
-                                 command=lambda: selectFile("merge", self.target_entry)
+                                 command=lambda: selectFile("upload", self.target_entry)
                                  ).grid(column=4, row=2, **setup.pad10)
-        browse_file = ttk.Button(self.upload,
-                                 text="Select",
-                                 command=lambda: selectFile("merge", self.source_entry)
-                                 ).grid(column=4, row=3, **setup.pad10)
         merge_btn = ttk.Button(self.upload,
-                               text="Merge",
-                               command=lambda: mergeFiles(self.target_entry.get(), self.source_entry.get(), self)
+                               text="Upload",
+                               command=lambda: mergeFiles(self.target_entry.get(), self)
                                ).grid(column=1, row=4, **setup.pad10)
         quit_btn = ttk.Button(self.upload,
                               text="Quit",
