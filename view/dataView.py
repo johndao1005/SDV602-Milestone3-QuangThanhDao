@@ -22,7 +22,7 @@ class dataView(tk.Tk):
         tk.Tk.__init__(self, )
         self.user = name
         self.resizable(0,0)
-        # self.geometry("940x800+0+0")
+        self.geometry("940x800+0+0")
         self.title(setup.app_name)
         self.iconbitmap(setup.icon)
         self.check = False

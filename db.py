@@ -1,12 +1,10 @@
 
 from pymongo import MongoClient
 from dotenv import load_dotenv
-
 from pathlib import Path
 import os
 import certifi
 ca = certifi.where()
-load_dotenv()
 env_path = Path('.')/'.env'
 load_dotenv(dotenv_path=env_path)
 
@@ -18,3 +16,4 @@ def connectDB():
         return client["white-shark"]
     except:
         print("Connection failed")
+        

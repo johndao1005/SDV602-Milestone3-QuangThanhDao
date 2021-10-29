@@ -6,7 +6,8 @@ from chart_create import draw_graph
 from mttkinter import mtTkinter as tk
 from tkinter import ttk
 import setup as setup
-from logout import logout
+import threading
+import time
 
 newline = '\n'
 
@@ -31,23 +32,93 @@ class DES(tk.Frame):
             window (variable): the frame or container which hold the 3 DES screen
             dataview (object): The main window which responsible for main functionality and data source
         """
-        self.lastModified = ''
+        self.lastModified = ""
         next = self.nextDES
         prev = self.prevDES
-        frame = self.frametype
-        label = ttk.Label(window, text=f"White shark {frame} data", font=setup.large).grid(
+        self.DES = self.frametype
+        label = ttk.Label(window, text=f"White shark {self.DES} data", font=setup.large).grid(
             column=0, row=0, **setup.pad20, columnspan=3)
         # graph
-        draw_graph(window, frame, dataview)
+        draw_graph(window, self.DES, dataview)
         button = ttk.Button(self,
                             text="Next",
                             command=lambda: dataview.show_frame(next)
-                            ).grid(column=2, row=2, **setup.pad20)
+                            ).grid(column=2, row=3, **setup.pad20)
         button = ttk.Button(self,
                             text="Previous",
                             command=lambda: dataview.show_frame(prev)
-                            ).grid(column=1, row=2, **setup.pad20)
-
+                            ).grid(column=1, row=3, **setup.pad20)
+        
+        # ANCHOR chat box right side
+        input = tk.StringVar()
+        # chat box creating and function
+        label = ttk.Label(self, text=f"Current user: {dataview.user}",font=setup.normal).grid(
+            column=3, row=0,**setup.pad5)
+        
+        frame1 = ttk.LabelFrame(self, text="Chat box", borderwidth=0)
+        frame1.grid(column=3, row=1, **setup.pad20, columnspan=2)
+        self.userLog = tk.Text(frame1,
+                               bg='white',
+                               font=setup.normal,
+                               height=4, width=50, yscrollcommand=set()
+                               )
+        self.userLog.grid(column=0, row=0, **setup.pad20, columnspan=2)
+        self.chatLog = tk.Text(frame1,
+                               bg='white',
+                               font=setup.normal,
+                               height=12,
+                               width=50
+                               )
+        self.chatLog.grid(column=0, row=1, **setup.pad20, columnspan=2)
+        
+        self.entry = ttk.Entry(frame1, textvariable=input, width=40, font=setup.normal)
+        self.entry.grid(
+            column=0, row=2, **setup.pad10, sticky="E")
+        button = ttk.Button(frame1,
+                            text="Send",
+                            command=lambda: dataview.chatSession.send_message(self.entry.get(),self)
+                            ).grid(column=1, row=2, **setup.pad10, sticky="E")
+        
+        # ANCHOR Data control frame
+        frame2 = ttk.LabelFrame(self, text="Data Control", borderwidth=0)
+        frame2.grid(column=3, row=2, **setup.pad10, columnspan=2,sticky="NEW")
+        button = ttk.Button(frame2,
+                            text="Update",
+                            command=lambda: dataview.loadDES()
+                            ).grid(column=0, row=1, **setup.pad20)
+        button = ttk.Button(frame2,
+                            text="Upload",
+                            command=lambda: dataview.openUpload()
+                            ).grid(column=1, row=1, **setup.pad20)
+        button = ttk.Button(self,
+                            text="Quit",
+                            command=lambda: dataview.quit() ).grid(column=3, row=3,sticky="E",**setup.pad20)
+        self.users = ""
+        self.chat = ""
+        self.thread = threading.Thread(target=self.updateChat, args=[dataview.chatSession],daemon=True)
+    
+    def updateChat(self,session):
+        while True:
+            time.sleep(2)
+            check = session.checkSession(self.DES)
+            if  check != self.lastModified:
+                users,chat = session.getData(self.DES)
+                self.update(users,chat)
+                self.lastModified = check
+            
+    def clearEntry(self):
+        self.entry.delete(0,tk.END)
+    
+    def update(self,users,chat):
+        self.chatLog['state']= 'normal'
+        self.userLog['state']= 'normal'
+        self.userLog.delete('1.0',tk.END)
+        self.chatLog.delete('1.0',tk.END)
+        self.userLog.insert('1.0',users)
+        self.chatLog.insert('1.0',chat)
+        self.chatLog['state']= 'disable'
+        self.userLog['state']= 'disable'
+        
 class genderDES(DES):
     """Generate gender DES which is a child of DES template
 

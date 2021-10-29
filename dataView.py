@@ -9,13 +9,9 @@ import view.setup as setup
 from merge_csv import mergeFiles
 from open_csv import selectFile
 from DES import genderDES, locationDES, featureDES
-import threading
-from chat import Session
-import time
-import queue
+from connect import Session,UserControl
 
-threadQueue = queue.Queue()
-class dataView(tk.Tk):
+class DataView(tk.Tk):
     """Data Explore Screen
     This is the main window which will display all the data regarding the datasource as long as the data is suitable.
     """
@@ -26,10 +22,9 @@ class dataView(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs )
         self.user = name
         self.resizable(0,0)
-        # self.geometry("940x800+0+0")
         self.title(setup.app_name)
         self.iconbitmap(setup.icon)
-        self.firstFrame = True
+        #self.geometry("1080x750+0+0")
         self.check = False
         self.protocol("WM_DELETE_WINDOW", self.quit)
         # ANCHOR frame setup left side
@@ -60,77 +55,11 @@ class dataView(tk.Tk):
         menubar.add_cascade(label="File", menu=filemenu)
         menubar.add_cascade(label="Data view", menu=DESmenu)
         tk.Tk.config(self, menu=menubar)
-
-        # ANCHOR chat box right side
-        input = tk.StringVar()
-        chatList = tk.StringVar()
-        userList = tk.StringVar()
-        # chat box creating and function
-        rightSide = tk.Frame()
-        rightSide.grid(column=1, row=0, **setup.pad20, columnspan=2,sticky="N")
-        label = ttk.Label(rightSide, text=f"Current user {self.user}",font=setup.normal).grid(
-            column=0, row=0)
-        Location_self = ttk.Button(rightSide,
-                                text="Sign out",
-                                command=lambda: logout(self)
-                                ).grid(column=1, row=0)
-
-        frame1 = ttk.LabelFrame(rightSide, text="Chat box", borderwidth=0)
-        frame1.grid(column=0, row=1, **setup.pad20, columnspan=2)
-        self.userLog = tk.Text(frame1,
-                               bg='white',
-                               font=setup.normal,
-                               height=4, width=50, yscrollcommand=set()
-                               )
-        self.userLog.grid(column=0, row=0, **setup.pad20, columnspan=2)
-        self.chatLog = tk.Text(frame1,
-                               bg='white',
-                               font=setup.normal,
-                               height=12,
-                               width=50
-                               )
-        self.chatLog.grid(column=0, row=1, **setup.pad20, columnspan=2)
-        
-        self.entry = ttk.Entry(frame1, textvariable=input, width=40, font=setup.normal)
-        self.entry.grid(
-            column=0, row=2, **setup.pad10, sticky="E")
-        button = ttk.Button(frame1,
-                            text="Send",
-                            command=lambda: self.chatSession.send_message(self.entry.get(),self)
-                            ).grid(column=1, row=2, **setup.pad10, sticky="E")
-        # ANCHOR Data control frame
-        frame2 = ttk.LabelFrame(rightSide, text="Data Control", borderwidth=0)
-        frame2.grid(column=0, row=2, **setup.pad20, columnspan=2,sticky="NEW")
-        button = ttk.Button(frame2,
-                            text="Update",
-                            command=lambda: self.loadDES()
-                            ).grid(column=0, row=1, **setup.pad20)
-        button = ttk.Button(frame2,
-                            text="Upload",
-                            command=lambda: self.openUpload()
-                            ).grid(column=1, row=1, **setup.pad20)
-        button = ttk.Button(self,
-                            text="Quit",
-                            command=lambda: self.quit() ).grid(column=2, row=1,sticky="E",**setup.pad20)
-        self.startSession()
-        self.loadDES()
-
-    #may setup 3 threads right away 
-    def startSession(self):
+        # START CHAT AND LOAD DES
         self.chatSession = Session(self.user)
-        self.firstDES = True
-        self.flag = False
+        self.userControl = UserControl()
+        self.loadDES()
     
-    def update(self,users,chat):
-        self.chatLog['state']= 'normal'
-        self.userLog['state']= 'normal'
-        self.userLog.delete('1.0',tk.END)
-        self.chatLog.delete('1.0',tk.END)
-        self.userLog.insert('1.0',users)
-        self.chatLog.insert('1.0',chat)
-        self.chatLog['state']= 'disable'
-        self.userLog['state']= 'disable'
-        
     # ANCHOR load all DES
     def loadDES(self, source=setup.datasource):
         """
@@ -139,43 +68,24 @@ class dataView(tk.Tk):
         self.source = source
         for DES in (genderDES, locationDES, featureDES):
             frame = DES(self.container, self)
+            frame.thread.start()
             self.frames[DES] = frame
             frame.grid(row=0, column=0, sticky="nsew")
-        self.show_frame(featureDES)
+        self.show_frame(locationDES)
+
 
     def show_frame(self, newFrame):
         """moving between data explorer screen 
-
         Args:
             newFrame (object): the screen to be presented 
         """
-        if self.firstDES == False:
-            self.flag = True
-            #self.thread.join()
-        self.firstDES = False
         frame = self.frames[newFrame]
-        self.DES = f'{frame.frametype}DES'
+        self.DES = frame.frametype
         self.chatSession.switch_DES(self.DES)
-        users,chat = self.chatSession.getData(self.DES)
-        self.update(users,chat)
+        # users,chat = self.chatSession.getData(self.DES)
+        # frame.update(users,chat)
         frame.tkraise()
-        self.thread = threading.Thread(target=self.updateChat,daemon=True)
-        self.thread.start()
         
-    def updateChat(self):
-        self.flag = False
-        while True:
-            if self.flag:
-                break
-            time.sleep(2)
-            users,chat = self.chatSession.getData(self.DES)
-            self.update(users,chat)
-            
-            
-    def clearEntry(self):
-        self.entry.delete(0,tk.END)
-
-
     def uploadWindow(self):
         """
         start a Top level window (pop up window) which attached to the Tk(main window)
@@ -230,3 +140,4 @@ class dataView(tk.Tk):
         """
         self.check = False
         self.upload.destroy()
+    
