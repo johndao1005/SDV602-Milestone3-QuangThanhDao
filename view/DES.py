@@ -5,14 +5,14 @@ afterward each DES will inherit from DES but responsible for displaying differen
 
 from mttkinter import mtTkinter as tk
 from tkinter import ttk
-import setup as setup
+import view.setup as setup
 import threading
 import time
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 import numpy as np
-from dataControl import Model
+from model.dataControl import Model
 import geopandas
 from matplotlib import style
 style.use("ggplot")
@@ -88,19 +88,19 @@ class DES(tk.Frame):
                             ).grid(column=1, row=2, **setup.pad10, sticky="E")
         
         # ANCHOR Data control frame
-        frame2 = ttk.LabelFrame(self, text="Data Control", borderwidth=0)
+        frame2 = ttk.LabelFrame(self, text="Control box", borderwidth=0)
         frame2.grid(column=3, row=2, **setup.pad10, columnspan=2,sticky="NEW")
         button = ttk.Button(frame2,
                             text="Update",
-                            command=lambda: dataview.loadDES()
+                            command=lambda: dataview.refresh()
                             ).grid(column=0, row=1, **setup.pad20)
         button = ttk.Button(frame2,
                             text="Upload",
                             command=lambda: dataview.openUpload()
                             ).grid(column=1, row=1, **setup.pad20)
-        button = ttk.Button(self,
+        button = ttk.Button(frame2,
                             text="Quit",
-                            command=lambda: dataview.quit() ).grid(column=3, row=3,sticky="E",**setup.pad20)
+                            command=lambda: dataview.quit() ).grid(column=2, row=1,sticky="E",**setup.pad20)
         self.users = ""
         self.chat = ""
         self.thread = threading.Thread(target=self.updateChat, args=[dataview.chatSession],daemon=True)

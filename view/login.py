@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import view.setup as setup
 from controller.login.auth import authentication
-from controller.login.register import makeUser
+from controller.login.register import register
+from model.connect import UserControl
 
 class Login(tk.Tk):
     """Start an instance of login screen which allow user to sign up with top level window or login directly
@@ -10,6 +11,7 @@ class Login(tk.Tk):
         destroy the current login to prevent multiple login.
         """
     def __init__(self, *args, **kwargs):
+        self.userControl = UserControl()
         tk.Tk.__init__(self, *args, **kwargs)
         self.title(setup.app_name)
         self.iconbitmap(setup.icon)
@@ -18,7 +20,7 @@ class Login(tk.Tk):
         self.resizable(0,0)
         label = ttk.Label(self, text="Login").grid(
             column=0, row=0, sticky="N", **options, columnspan=3)
-        self.geometry("280x250+500+300")
+        #self.geometry("280x250+500+300")
         self.check = False
         # ANCHOR data input
         lf = ttk.Frame(
@@ -75,7 +77,6 @@ class Login(tk.Tk):
         password = tk.StringVar()
         confirmPassword = tk.StringVar()
         email = tk.StringVar()
-
         lf = ttk.LabelFrame(self.signup, text="Login details")
         lf.grid(column=0, row=1, padx=20, pady=20)
         label = ttk.Label(lf, text="Email").grid(
@@ -84,7 +85,7 @@ class Login(tk.Tk):
         email_entry.grid(
             column=1, row=3, **options)
         
-        label = ttk.Label(lf, text=" FirstName").grid(
+        label = ttk.Label(lf, text="Username").grid(
             column=0, row=5, **options)
         username_entry = ttk.Entry(lf, textvariable=username)
         username_entry.grid(
@@ -102,7 +103,7 @@ class Login(tk.Tk):
         
         button = ttk.Button(lf,
                             text="Sign Up",
-                            command=lambda: makeUser(self.signup,
+                            command=lambda: register(self,
                                 username_entry.get(), password_entry.get(), confirmpassword_entry.get(), email_entry.get())
                             ).grid(column=0, row=11, **options, columnspan=2)
         button = ttk.Button(self.signup,
@@ -115,4 +116,3 @@ class Login(tk.Tk):
         """
         self.check = False
         self.signup.destroy()
-        #TODO can add function to add the newly created user details into the signup window and maybe remember me?

@@ -4,7 +4,7 @@ With the application user can view data in graph with matplotlib while enjoy the
 
 """
 
-from login import Login 
+from view.login import Login 
 def start():
     app = Login()
     app.mainloop()

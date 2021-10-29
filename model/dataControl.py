@@ -2,7 +2,7 @@
 Model class which contain method to get the raw data from csv DataManager, merge files or read the location data with pandas.
 After that filter the data in different catogeries with different methods such as featureData, locationData and genderData
 """
-from connect import DataHandler
+from model.connect import DataHandler
 import pandas as pd
 import csv
 

@@ -1,4 +1,4 @@
-from db import connectDB
+from config.db import connectDB
 import bcrypt
 from datetime import datetime
 from pymongo import UpdateOne
