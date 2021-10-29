@@ -2,22 +2,23 @@
 Setup screen for each DES which is a frame to be displayed on main window dataview. DES is the template which handle displaying data as well as holding the buttons
 afterward each DES will inherit from DES but responsible for displaying different type of data and graph.
 """
-
+import view.setup as setup
+from model.dataControl import Model
 from mttkinter import mtTkinter as tk
 from tkinter import ttk
-import view.setup as setup
 import threading
 import time
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 import numpy as np
-from model.dataControl import Model
 import geopandas
 from matplotlib import style
 style.use("ggplot")
 
+
 newline = '\n'
+
 
 class DES(tk.Frame):
     """
@@ -56,13 +57,13 @@ class DES(tk.Frame):
                             text="Previous",
                             command=lambda: dataview.show_frame(prev)
                             ).grid(column=1, row=3, **setup.pad20)
-        
+
         # ANCHOR chat box right side
         input = tk.StringVar()
         # chat box creating and function
-        label = ttk.Label(self, text=f"Current user: {dataview.user}",font=setup.normal).grid(
-            column=3, row=0,**setup.pad5)
-        
+        label = ttk.Label(self, text=f"Current user: {dataview.user}", font=setup.normal).grid(
+            column=3, row=0, **setup.pad5)
+
         frame1 = ttk.LabelFrame(self, text="Chat box", borderwidth=0)
         frame1.grid(column=3, row=1, **setup.pad20, columnspan=2)
         self.userLog = tk.Text(frame1,
@@ -78,18 +79,20 @@ class DES(tk.Frame):
                                width=50
                                )
         self.chatLog.grid(column=0, row=1, **setup.pad20, columnspan=2)
-        
-        self.entry = ttk.Entry(frame1, textvariable=input, width=40, font=setup.normal)
+
+        self.entry = ttk.Entry(frame1, textvariable=input,
+                               width=40, font=setup.normal)
         self.entry.grid(
             column=0, row=2, **setup.pad10, sticky="E")
         button = ttk.Button(frame1,
                             text="Send",
-                            command=lambda: dataview.chatSession.send_message(self.entry.get(),self)
+                            command=lambda: dataview.chatSession.send_message(
+                                self.entry.get(), self)
                             ).grid(column=1, row=2, **setup.pad10, sticky="E")
-        
+
         # ANCHOR Data control frame
         frame2 = ttk.LabelFrame(self, text="Control box", borderwidth=0)
-        frame2.grid(column=3, row=2, **setup.pad10, columnspan=2,sticky="NEW")
+        frame2.grid(column=3, row=2, **setup.pad10, columnspan=2, sticky="NEW")
         button = ttk.Button(frame2,
                             text="Update",
                             command=lambda: dataview.refresh()
@@ -100,42 +103,53 @@ class DES(tk.Frame):
                             ).grid(column=1, row=1, **setup.pad20)
         button = ttk.Button(frame2,
                             text="Quit",
-                            command=lambda: dataview.quit() ).grid(column=2, row=1,sticky="E",**setup.pad20)
+                            command=lambda: dataview.quit()).grid(column=2, row=1, sticky="E", **setup.pad20)
         self.users = ""
         self.chat = ""
-        self.thread = threading.Thread(target=self.updateChat, args=[dataview.chatSession],daemon=True)
-    
-    def updateChat(self,session):
+        self.thread = threading.Thread(target=self.updateChat, args=[
+                                       dataview.chatSession], daemon=True)
+
+    def updateChat(self, session):
+        """function to for thread to update chat while checking the session
+
+        Args:
+            session (string): local timestamp of the session
+        """
         while True:
             time.sleep(2)
             check = session.checkSession(self.DES)
-            if  check != self.lastModified:
-                users,chat = session.getData(self.DES)
-                self.update(users,chat)
+            if check != self.lastModified:
+                users, chat = session.getData(self.DES)
+                self.update(users, chat)
                 self.lastModified = check
-            
+
     def clearEntry(self):
-        self.entry.delete(0,tk.END)
-    
-    def update(self,users,chat):
-        self.chatLog['state']= 'normal'
-        self.userLog['state']= 'normal'
-        self.userLog.delete('1.0',tk.END)
-        self.chatLog.delete('1.0',tk.END)
-        self.userLog.insert('1.0',users)
-        self.chatLog.insert('1.0',chat)
-        self.chatLog['state']= 'disable'
-        self.userLog['state']= 'disable'
-        
-        
+        """function to clear the entry after upload
+        """
+        self.entry.delete(0, tk.END)
+
+    def update(self, users, chat):
+        """function to update the text for user log and chat log for the current DES
+
+        Args:
+            users (string): user list
+            chat (string): chat log
+        """
+        self.chatLog['state'] = 'normal'
+        self.userLog['state'] = 'normal'
+        self.userLog.delete('1.0', tk.END)
+        self.chatLog.delete('1.0', tk.END)
+        self.userLog.insert('1.0', users)
+        self.chatLog.insert('1.0', chat)
+        self.chatLog['state'] = 'disable'
+        self.userLog['state'] = 'disable'
+
     def draw_graph(self, frame):
         """Function used to draw the graph on the window depend on the current frame as well
         as controlling the tool bar. the data is provided in the source from dataview.
 
         Args:
-            window (variable): the frame to plot graph
             frame (string): data type to be displayed on the graph      
-            dataview (variable): dataview window to control the data source as well as the reloading function
         """
         database = Model()
         # ANCHOR prepare graph
@@ -143,7 +157,7 @@ class DES(tk.Frame):
         ax = fig.add_subplot(111)
         # data type plot in graph
         if frame == "feature":
-            #Create data store
+            # Create data store
             labels = []
             mature = []
             immature = []
@@ -152,10 +166,10 @@ class DES(tk.Frame):
             size400 = []
             sizeUnder440 = []
             sizeAbove440 = []
-            #Extract filtered
+            # Extract filtered
             data = database.featureData()
-            # sort value 
-            for key  in sorted (data.keys()):
+            # sort value
+            for key in sorted(data.keys()):
                 labels.append(key)
                 mature.append(data[key][0])
                 immature.append(data[key][1])
@@ -165,16 +179,18 @@ class DES(tk.Frame):
                 sizeUnder440.append(data[key][5])
                 sizeAbove440.append(data[key][6])
             # the label locations
-            x = np.arange(len(labels))  
+            x = np.arange(len(labels))
             # the width of the bars
-            width = 0.1  
+            width = 0.1
             rects1 = ax.bar(x + width, mature, width, label='Mature')
             rects2 = ax.bar(x + width*2, immature, width, label='Immature')
             rects3 = ax.bar(x + width*3, size300, width, label='300 cm')
             rects4 = ax.bar(x + width*4, size350, width, label='350 cm')
             rects5 = ax.bar(x + width*5, size400, width, label='400 cm')
-            rects6 = ax.bar(x + width*6, sizeUnder440, width, label='Below 400 cm')
-            rects7 = ax.bar(x + width*7, sizeAbove440, width, label='Above 440 cm')
+            rects6 = ax.bar(x + width*6, sizeUnder440,
+                            width, label='Below 400 cm')
+            rects7 = ax.bar(x + width*7, sizeAbove440,
+                            width, label='Above 440 cm')
             ax.set_xlabel('Year')
             ax.set_xticks(x)
             ax.set_xticklabels(labels)
@@ -187,28 +203,31 @@ class DES(tk.Frame):
             ax.bar_label(rects6, padding=2)
             ax.bar_label(rects7, padding=2)
             ax.plot()
-            
+
         elif frame == "gender":
-            #Create data store
+            # Create data store
             label = []
             value = []
-            #Extract filtered
+            # Extract filtered
             data = database.genderData()
-            for key  in data:
+            for key in data:
                 label.append(key)
                 value.append(data[key])
-            #Draw the graph
-            ax.pie(value, radius=1, labels=label,autopct='%0.2f%%', shadow=True,)
-        
+            # Draw the graph
+            ax.pie(value, radius=1, labels=label,
+                   autopct='%0.2f%%', shadow=True,)
+
         elif frame == "location":
-            #extract filtered data
+            # extract filtered data
             data = database.locationData()
-            #getting map for NZ
-            countries = geopandas.read_file(geopandas.datasets.get_path("naturalearth_lowres"))
-            countries[countries["name"] == "New Zealand"].plot(color="lightgrey", ax=ax)
+            # getting map for NZ
+            countries = geopandas.read_file(
+                geopandas.datasets.get_path("naturalearth_lowres"))
+            countries[countries["name"] == "New Zealand"].plot(
+                color="lightgrey", ax=ax)
             # Plot map
-            data.plot(x="decimalLongitude", y="decimalLatitude", kind="scatter", colormap="YlOrRd", 
-            title=f"New Zealand Location", ax=ax)
+            data.plot(x="decimalLongitude", y="decimalLatitude", kind="scatter", colormap="YlOrRd",
+                      title=f"New Zealand Location", ax=ax)
             ax.grid(b=True, alpha=0.5)
             ax.set_xlabel('Longtitude')
             ax.set_ylabel('Latitude')
@@ -221,9 +240,10 @@ class DES(tk.Frame):
         # pack_toolbar=False will make it easier to use a layout manager later on.
         toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=False)
         toolbar.update()
-        canvas.get_tk_widget().grid(column=0, row=1,columnspan=3,rowspan=2)  # create canvas
+        canvas.get_tk_widget().grid(column=0, row=1, columnspan=3, rowspan=2)  # create canvas
         toolbar.grid(column=0, row=3)  # create tool bar
-        
+
+
 class genderDES(DES):
     """Generate gender DES which is a child of DES template
 
@@ -260,7 +280,7 @@ class locationDES(DES):
 
 class featureDES(DES):
     """Generate feature DES which is a child of DES template
-    
+
     Args:
         DES (object): DES template
     """

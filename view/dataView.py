@@ -4,32 +4,34 @@ Contain the dataView class which handle the DES window outline as well as upload
 from mttkinter import mtTkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showinfo
-import view.setup as setup
 
+import view.setup as setup
 from controller.menu.merge_csv import mergeFiles
 from controller.menu.upload import selectFile
 from view.DES import genderDES, locationDES, featureDES
-from model.connect import Session,UserControl,DataHandler
+from model.connect import Session, UserControl, DataHandler
+
 
 class DataView(tk.Tk):
     """Data Explore Screen
     This is the main window which will display all the data regarding the datasource as long as the data is suitable.
     """
-    def __init__(self,name='User',*args, **kwargs):
+
+    def __init__(self, name='User', *args, **kwargs):
         """
         start the instance of dataView main window when it is called 
         """
-        tk.Tk.__init__(self, *args, **kwargs )
+        tk.Tk.__init__(self, *args, **kwargs)
         self.user = name
-        self.resizable(0,0)
+        self.resizable(0, 0)
         self.title(setup.app_name)
         self.iconbitmap(setup.icon)
-        #self.geometry("1080x750+0+0")
+        # self.geometry("1080x750+0+0")
         self.check = False
         self.protocol("WM_DELETE_WINDOW", self.quit)
         # ANCHOR frame setup left side
         self.container = ttk.Frame()
-        self.container.grid(column=0, row=0,sticky="NW")
+        self.container.grid(column=0, row=0, sticky="NW")
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
         self.frames = {}
@@ -37,10 +39,11 @@ class DataView(tk.Tk):
         menubar = tk.Menu(self.container)
         filemenu = tk.Menu(menubar, tearoff=0)
         filemenu.add_command(label="Choose Data Source",
-                            command=lambda: selectFile("open", self))
+                             command=lambda: selectFile("open", self))
         filemenu.add_command(label="Merge database",
-                            command=lambda: self.openUpload())
-        filemenu.add_command(label="Sign out", command=lambda: showinfo("Unavailable","Function is not available, please come back for it later"))
+                             command=lambda: self.openUpload())
+        filemenu.add_command(label="Sign out", command=lambda: showinfo(
+            "Unavailable", "Function is not available, please come back for it later"))
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.quit)
         DESmenu = tk.Menu(menubar, tearoff=0)
@@ -61,9 +64,9 @@ class DataView(tk.Tk):
         self.userControl = UserControl()
         self.dataHandler = DataHandler()
         self.lastModified = self.dataHandler.checkRecord()
-    
+
     # ANCHOR load all DES
-    def loadDES(self):#, source=setup.datasource):
+    def loadDES(self):  # , source=setup.datasource):
         """
         Load the data explorer screen with the given data source else load the default data source
         """
@@ -77,6 +80,8 @@ class DataView(tk.Tk):
         self.show_frame(featureDES)
 
     def refresh(self):
+        """redraw the graph to retrieve the latest data or render the upload data
+        """
         for DES in (genderDES, locationDES, featureDES):
             frame = self.frames[DES]
             frame.draw_graph(frame.DES)
@@ -90,7 +95,7 @@ class DataView(tk.Tk):
         self.DES = frame.frametype
         self.chatSession.switch_DES(self.DES)
         frame.tkraise()
-        
+
     def uploadWindow(self):
         """
         start a Top level window (pop up window) which attached to the Tk(main window)
@@ -113,11 +118,13 @@ class DataView(tk.Tk):
             column=1, row=2, **options, columnspan=3)
         browse_file = ttk.Button(self.upload,
                                  text="Select",
-                                 command=lambda: selectFile("upload", self.target_entry)
+                                 command=lambda: selectFile(
+                                     "upload", self.target_entry)
                                  ).grid(column=4, row=2, **setup.pad10)
         merge_btn = ttk.Button(self.upload,
                                text="Upload",
-                               command=lambda: mergeFiles(self.target_entry.get(), self)
+                               command=lambda: mergeFiles(
+                                   self.target_entry.get(), self)
                                ).grid(column=1, row=4, **setup.pad10)
         quit_btn = ttk.Button(self.upload,
                               text="Quit",
@@ -135,4 +142,3 @@ class DataView(tk.Tk):
         """
         self.check = False
         self.upload.destroy()
-    

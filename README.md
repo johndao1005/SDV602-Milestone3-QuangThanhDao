@@ -25,6 +25,8 @@ To ensure the application is working, those modules is required to be install wi
 - matplotlib
 - numpy
 - bcrypt
+- python-dotenv
+- 
 
 ## Install geopandas
 
@@ -41,4 +43,3 @@ pip install Fiona-1.8.20-cp39-cp39-win_amd64
 pip install geopandas
 
 ```
-

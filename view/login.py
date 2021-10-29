@@ -1,15 +1,17 @@
-import tkinter as tk 
+import tkinter as tk
 from tkinter import ttk
 import view.setup as setup
 from controller.login.auth import authentication
 from controller.login.register import register
 from model.connect import UserControl
 
+
 class Login(tk.Tk):
     """Start an instance of login screen which allow user to sign up with top level window or login directly
         When users login, the class would open to menu which is another class which handle the data view, update, delete while
         destroy the current login to prevent multiple login.
         """
+
     def __init__(self, *args, **kwargs):
         self.userControl = UserControl()
         tk.Tk.__init__(self, *args, **kwargs)
@@ -17,10 +19,9 @@ class Login(tk.Tk):
         self.iconbitmap(setup.icon)
         options = setup.pad10
         option2 = setup.pad5
-        self.resizable(0,0)
+        self.resizable(0, 0)
         label = ttk.Label(self, text="Login").grid(
             column=0, row=0, sticky="N", **options, columnspan=3)
-        #self.geometry("280x250+500+300")
         self.check = False
         # ANCHOR data input
         lf = ttk.Frame(
@@ -63,6 +64,8 @@ class Login(tk.Tk):
             self.signupWindow()
 
     def signupWindow(self):
+        """function to create a sign up window as toplevel window
+        """
         self.check = True
         self.signup = tk.Toplevel()
         self.signup.title(setup.app_name)
@@ -84,7 +87,6 @@ class Login(tk.Tk):
         email_entry = ttk.Entry(lf, textvariable=email)
         email_entry.grid(
             column=1, row=3, **options)
-        
         label = ttk.Label(lf, text="Username").grid(
             column=0, row=5, **options)
         username_entry = ttk.Entry(lf, textvariable=username)
@@ -100,11 +102,10 @@ class Login(tk.Tk):
         confirmpassword_entry = ttk.Entry(
             lf, textvariable=confirmPassword, show="*")
         confirmpassword_entry.grid(column=1, row=9, **options)
-        
         button = ttk.Button(lf,
                             text="Sign Up",
                             command=lambda: register(self,
-                                username_entry.get(), password_entry.get(), confirmpassword_entry.get(), email_entry.get())
+                                                     username_entry.get(), password_entry.get(), confirmpassword_entry.get(), email_entry.get())
                             ).grid(column=0, row=11, **options, columnspan=2)
         button = ttk.Button(self.signup,
                             text="Cancel",

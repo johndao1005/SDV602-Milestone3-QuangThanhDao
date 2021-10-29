@@ -2,7 +2,8 @@ from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
 from tkinter import *
 
-def selectFile(action,target):
+
+def selectFile(action, target):
     """Function used to open the csv file to read to file name/ directory
     to used with different action to update the target folder
 
@@ -11,12 +12,12 @@ def selectFile(action,target):
         target (variable): the target to update with the result of action regarding the file
     """
     filetypes = (
-            ('csv', '*.csv'),
-        )
+        ('csv', '*.csv'),
+    )
     filename = fd.askopenfilename(
-            title='Select csv datasource',
-            initialdir='./data-sample',
-            filetypes=filetypes)
-    
-    if action =="upload":
-        target.insert(END,filename)
+        title='Select csv datasource',
+        initialdir='./data-sample',
+        filetypes=filetypes)
+
+    if action == "upload":
+        target.insert(END, filename)
