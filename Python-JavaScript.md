@@ -54,7 +54,7 @@ This perfectly sum up van Rossum’s philosophy for Python to be extreme sparse 
 
 ### Visual Studio Code
 
-Visual Studio Code or Vs code is a product of Microsoft and it can operate on Linux and MacOS system. While initially created for web development, Vs code group and support over 30 programming language as of now. The IDE also come with IntelliSense feature like Visual Studio which enable developers to code fast with code suggestions, hint and parameter description. Furthermore, Vs code also come with first-rate debugger for JavaScript and Node.js application while other languages debugger extension also included in the marketplace. Lastly,  The IDE is supported with large community and a huge range of extension which allow developers to tailor Vs code to accommodate their needs.
+Visual Studio Code or Vs code is a product of Microsoft and it can operate on Linux and MacOS system. While initially created for web development, Vs code group and support over 30 programming language as of now. The IDE also come with IntelliSense feature like Visual Studio which enable developers to code fast with code suggestions, hint and parameter description. Furthermore, Vs code also come with first-rate debugger for JavaScript and Node.js application while other languages debugger extension also included in the marketplace. Lastly,  The IDE is supported with large community and a huge range of extension which allow developers to tailor Vs code to accommodate their needs. The IDE can be used to code both Python and JavaScript.
 
 According to dev.to, here are the pros and cons of Atom:
 
@@ -74,7 +74,7 @@ According to dev.to, here are the pros and cons of Atom:
 
 ### Atom
 
-Atom is a free and open-source code editor for macOS, Linux and Microsoft Windows with support for plug-ins written in Node.js, and embedded Git Control. The code editor can be supported with plug-ins to suit the development needs and programming languages such as JavaScript and Python. Moreover, similar with Vs Code, Atom is highly customisable with themes and extensions for code hinting or clean up and the options is endless due the fact Atom is open-source. 
+Atom is a free and open-source code editor for macOS, Linux and Microsoft Windows with support for plug-ins written in Node.js, and embedded Git Control. The code editor can be supported with plug-ins to suit the development needs and programming languages such as JavaScript and Python. Moreover, similar with Vs Code, Atom is highly customisable with themes and extensions for code hinting or clean up and the options is endless due the fact Atom is open-source.  The IDE can be used to code both Python and JavaScript.
 
 According to dev.to, here are the pros and cons of Atom:
 
