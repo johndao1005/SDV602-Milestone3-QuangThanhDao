@@ -185,6 +185,7 @@ source:
 
 - https://data-flair.training/blogs/advantages-disadvantages-javascript/
 - https://kcpelearning.com/showcourse/python3/strengths-and-weaknesses
+- https://www.freecodecamp.org/news/python-vs-javascript-what-are-the-key-differences-between-the-two-popular-programming-languages/
 
 ## Reference
 
